@@ -15,15 +15,15 @@ public class ShipmentServiceImpl implements ShipmentService {
         return null;
     }
     @Override
-    public Shipment createShipment(String id, Order order, String status) {
+    public Shipment createShipment(String id, String orderId, String status) {
         return null;
     }
     @Override
-    public Shipment createShipment(String id, Order order) {
+    public Shipment createShipment(String id, String orderId) {
         return null;
     }
     @Override
-    public Shipment editShipment(String id, Order order, String status) {
+    public Shipment editShipment(String id, String orderId, String status) {
         return null;
     }
     @Override

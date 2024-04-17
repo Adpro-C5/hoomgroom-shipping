@@ -11,15 +11,15 @@ public class ShipmentRepository {
         return null;
     }
 
-    public Shipment createShipment(String id, Order order, String status) {
+    public Shipment createShipment(String id, String orderId, String status) {
         return null;
     }
 
-    public Shipment createShipment(String id, Order order) {
+    public Shipment createShipment(String id, String orderId) {
         return null;
     }
 
-    public Shipment editShipment(String id, Order order, String status) {
+    public Shipment editShipment(String id, String orderId, String status) {
         return null;
     }
 
