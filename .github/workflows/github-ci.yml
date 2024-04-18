@@ -104,14 +104,13 @@ jobs:
       - name: Install SSH client
         run: sudo apt-get install openssh-client
 
-      - name: create ssh key
-        run: echo "${{ secrets.SSH_KEY }}" > ssh-key.pem && cat ssh-key.pem
-
-      - name: update permission
-        run: chmod 400 ssh-key.pem
-      - name: Deploy to GCP
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ssh-key.pem ${{ secrets.GCP_USERNAME }}@${{ secrets.GCP_STATIC_IP }} "
-            sudo docker container rm -f ${{ secrets.CONTAINER_NAME }} || true &&
-            sudo docker image rm -f ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} || true &&
-            sudo docker run --name ${{ secrets.CONTAINER_NAME }} -d -p 80:8080 ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}"
+      - name: Deploy Docker container
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GCP_STATIC_IP }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+                sudo docker container rm -f ${{ secrets.CONTAINER_NAME }} || true
+                sudo docker image rm -f ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} || true
+                sudo docker run --name ${{ secrets.CONTAINER_NAME }} -d -p 80:8080 ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
