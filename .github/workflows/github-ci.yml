@@ -98,9 +98,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: publish
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
       - name: Install SSH client
         run: sudo apt-get install openssh-client
 
@@ -111,6 +108,8 @@ jobs:
           username: ${{ secrets.GCP_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+                git clone https://github.com/Adpro-C5/hoomgroom-shipping || true
+                cd hoomgroom-shipping || true
                 sudo docker container rm -f ${{ secrets.CONTAINER_NAME }} || true
                 sudo docker image rm -f ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} || true
                 sudo docker run --name ${{ secrets.CONTAINER_NAME }} -d -p 80:8080 ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
