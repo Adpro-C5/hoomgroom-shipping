@@ -7,4 +7,12 @@ public class ShipmentFactory implements Factory<Shipment>{
     public Shipment create() {
         return null;
     }
+    @Override
+    public Shipment create(String id, String orderId) {
+        return null;
+    }
+    @Override
+    public Shipment create(String id, String orderId, String status) {
+        return null;
+    }
 }
