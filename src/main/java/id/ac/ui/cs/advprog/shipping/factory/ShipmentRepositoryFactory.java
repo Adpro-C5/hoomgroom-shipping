@@ -5,14 +5,14 @@ import id.ac.ui.cs.advprog.shipping.repository.ShipmentRepository;
 public class ShipmentRepositoryFactory implements Factory<ShipmentRepository>{
     @Override
     public ShipmentRepository create() {
-        return null;
+        return new ShipmentRepository();
     }
     @Override
     public ShipmentRepository create(String id, String orderId) {
-        return null;
+        throw new UnsupportedOperationException();
     }
     @Override
     public ShipmentRepository create(String id, String orderId, String status) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }
