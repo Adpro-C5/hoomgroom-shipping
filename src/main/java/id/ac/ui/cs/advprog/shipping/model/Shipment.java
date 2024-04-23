@@ -8,14 +8,14 @@ import lombok.Setter;
 @Getter
 public class Shipment {
     String id;
-    Order order;
+    String orderId;
     String status;
 
-    public Shipment(String id, Order order) {
+    public Shipment(String id, String orderId) {
 
     }
 
-    public Shipment(String id, Order order, String status) {
+    public Shipment(String id, String orderId, String status) {
 
     }
 
