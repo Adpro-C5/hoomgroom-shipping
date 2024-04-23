@@ -1,5 +1,6 @@
-package id.ac.ui.cs.advprog.shipping.model;
+package id.ac.ui.cs.advprog.shipping.repository;
 
+import id.ac.ui.cs.advprog.shipping.model.Shipment;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

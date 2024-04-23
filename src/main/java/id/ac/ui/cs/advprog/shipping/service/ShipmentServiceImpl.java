@@ -1,8 +1,7 @@
 package id.ac.ui.cs.advprog.shipping.service;
 
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
-import id.ac.ui.cs.advprog.shipping.model.ShipmentRepository;
-import id.ac.ui.cs.advprog.shipping.service.ShipmentService;
+import id.ac.ui.cs.advprog.shipping.repository.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
