@@ -114,4 +114,12 @@ class ShipmentServiceImplTest {
         verify(shipmentRepository, times(1)).findById(shipment.getId());
         assertNull(result);
     }
+
+    @Test
+    void testFindAll() {
+        doReturn(shipments).when(shipmentRepository).findAll();
+        List<Shipment> result = shipmentService.getAllShipments();
+        verify(shipmentRepository, times(1)).findAll();
+        assertEquals(shipments, result);
+    }
 }
