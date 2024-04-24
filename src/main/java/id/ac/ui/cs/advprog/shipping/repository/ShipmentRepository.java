@@ -10,18 +10,40 @@ import java.util.List;
 public class ShipmentRepository {
     private List<Shipment> shipmentData = new ArrayList<>();
     public Shipment findById(String id) {
+        for (Shipment shipment : shipmentData) {
+            if (shipment.getId().equals(id)) {
+                return shipment;
+            }
+        }
         return null;
     }
 
     public Shipment findByOrderId(String orderId) {
+        for (Shipment shipment : shipmentData) {
+            if (shipment.getOrderId().equals(orderId)) {
+                return shipment;
+            }
+        }
         return null;
     }
 
     public Shipment saveShipment(Shipment shipment) {
-        return null;
+        int index = shipmentData.indexOf(shipment);
+        if (index == -1) {
+            shipmentData.add(shipment);
+            return shipment;
+        } else {
+            shipmentData.set(index, shipment);
+            return null;
+        }
     }
 
     public Shipment deleteShipment(String id) {
+        Shipment shipment = findById(id);
+        if (shipment != null) {
+            shipmentData.remove(shipment);
+            return shipment;
+        }
         return null;
     }
 }
