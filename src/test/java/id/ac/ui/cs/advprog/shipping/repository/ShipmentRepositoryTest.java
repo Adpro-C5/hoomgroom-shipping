@@ -127,4 +127,16 @@ public class ShipmentRepositoryTest {
 
         assertNull(shipmentRepository.findByOrderId("3"));
     }
+
+    @Test
+    void testFindAll(){
+        Shipment shipment1 = shipments.get(0);
+        Shipment shipment2 = shipments.get(1);
+        shipmentRepository.saveShipment(shipment1);
+        shipmentRepository.saveShipment(shipment2);
+        List<Shipment> compare = shipmentRepository.findAll();
+        assertEquals(shipment1, compare.get(0));
+        assertEquals(shipment2, compare.get(1));
+        assertEquals(compare.size(), 2);
+    }
 }

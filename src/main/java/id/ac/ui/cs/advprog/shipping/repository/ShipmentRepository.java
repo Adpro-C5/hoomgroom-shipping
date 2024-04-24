@@ -46,4 +46,8 @@ public class ShipmentRepository {
         }
         return null;
     }
+
+    public List<Shipment> findAll() {
+        return shipmentData;
+    }
 }

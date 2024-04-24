@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class ShipmentServiceImpl implements ShipmentService {
@@ -14,31 +15,41 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     public Shipment findById(String id) {
-        return null;
+        return shipmentRepository.findById(id);
     }
 
     @Override
     public Shipment findByOrderId(String orderId) {
-        return null;
+        return shipmentRepository.findByOrderId(orderId);
     }
 
     @Override
     public Shipment saveShipment(Shipment shipment) {
-        return null;
+        if (shipmentRepository.findById(shipment.getId()) == null) {
+            return shipmentRepository.saveShipment(shipment);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public Shipment deleteShipment(String id) {
-        return null;
+        return shipmentRepository.deleteShipment(id);
     }
 
     @Override
     public List<Shipment> getAllShipments() {
-        return null;
+        return shipmentRepository.findAll();
     }
 
     @Override
     public Shipment setShipmentStatus(String id, String status) {
-        return null;
+        Shipment shipmentToChange = shipmentRepository.findById(id);
+        if (shipmentToChange != null) {
+            shipmentToChange.setStatus(status);
+            return shipmentRepository.saveShipment(shipmentToChange);
+        } else {
+            throw new NoSuchElementException();
+        }
     }
 }
