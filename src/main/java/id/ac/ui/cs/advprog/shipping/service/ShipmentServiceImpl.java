@@ -5,6 +5,8 @@ import id.ac.ui.cs.advprog.shipping.repository.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ShipmentServiceImpl implements ShipmentService {
     @Autowired
@@ -14,19 +16,29 @@ public class ShipmentServiceImpl implements ShipmentService {
     public Shipment findById(String id) {
         return null;
     }
+
     @Override
-    public Shipment createShipment(String id, String orderId, String status) {
+    public Shipment findByOrderId(String orderId) {
         return null;
     }
+
     @Override
-    public Shipment createShipment(String id, String orderId) {
+    public Shipment saveShipment(Shipment shipment) {
         return null;
     }
+
     @Override
-    public Shipment editShipment(String id, String orderId, String status) {
+    public Shipment deleteShipment(String id) {
         return null;
     }
+
     @Override
-    public void deleteShipment(String id) {
+    public List<Shipment> getAllShipments() {
+        return null;
+    }
+
+    @Override
+    public Shipment setShipmentStatus(String id, String status) {
+        return null;
     }
 }
