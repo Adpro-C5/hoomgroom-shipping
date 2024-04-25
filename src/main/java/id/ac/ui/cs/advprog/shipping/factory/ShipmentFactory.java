@@ -8,6 +8,10 @@ public class ShipmentFactory implements Factory<Shipment>{
         return new Shipment();
     }
     @Override
+    public Shipment create(String orderId) {
+        return new Shipment(orderId);
+    }
+    @Override
     public Shipment create(String id, String orderId) {
         return new Shipment(id, orderId);
     }

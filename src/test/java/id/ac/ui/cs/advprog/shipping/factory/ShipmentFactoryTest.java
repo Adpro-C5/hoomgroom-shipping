@@ -17,6 +17,14 @@ public class ShipmentFactoryTest {
     }
 
     @Test
+    void testCreateWithOrderId() {
+        ShipmentFactory shipmentFactory = new ShipmentFactory();
+        Shipment shipment = shipmentFactory.create("1");
+        assertEquals("1", shipment.getOrderId());
+        assertEquals(ShippingStatus.MENUNGGU_VERIFIKASI.getValue(), shipment.getStatus());
+    }
+
+    @Test
     void testCreateWithIdAndOrderId() {
         ShipmentFactory shipmentFactory = new ShipmentFactory();
         Shipment shipment = shipmentFactory.create("1", "1");

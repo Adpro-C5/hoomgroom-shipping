@@ -8,6 +8,10 @@ public class ShipmentRepositoryFactory implements Factory<ShipmentRepository>{
         return new ShipmentRepository();
     }
     @Override
+    public ShipmentRepository create(String orderId) {
+        throw new UnsupportedOperationException();
+    }
+    @Override
     public ShipmentRepository create(String id, String orderId) {
         throw new UnsupportedOperationException();
     }
