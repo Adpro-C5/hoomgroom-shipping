@@ -2,28 +2,34 @@ package id.ac.ui.cs.advprog.shipping.repository;
 
 import enums.ShippingStatus;
 import id.ac.ui.cs.advprog.shipping.factory.ShipmentFactory;
-import id.ac.ui.cs.advprog.shipping.factory.ShipmentRepositoryFactory;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
+import id.ac.ui.cs.advprog.shipping.repository.ShipmentRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class ShipmentRepositoryTest {
-    ShipmentRepository shipmentRepository;
-    ShipmentRepositoryFactory shipmentRepositoryFactory;
-    List<Shipment> shipments;
-    ShipmentFactory shipmentFactory;
+    @Mock
+    private EntityManager entityManager;
+
+    @InjectMocks
+    private ShipmentRepository shipmentRepository;
+    private ArrayList<Shipment> shipments;
 
     @BeforeEach
     public void setUp() {
-        shipmentRepositoryFactory = new ShipmentRepositoryFactory();
-        shipmentRepository = shipmentRepositoryFactory.create();
-        shipmentFactory = new ShipmentFactory();
+        ShipmentFactory shipmentFactory = new ShipmentFactory();
         Shipment shipment1 = shipmentFactory.create("1", "1", ShippingStatus.DIKIRIM.getValue());
         Shipment shipment2 = shipmentFactory.create("2", "2", ShippingStatus.DIPROSES.getValue());
         shipments = new ArrayList<>();
@@ -33,110 +39,44 @@ public class ShipmentRepositoryTest {
     @Test
     void testSaveShipment() {
         Shipment shipment = shipments.get(0);
-        shipmentRepository.saveShipment(shipment);
-        Shipment compare = shipmentRepository.findById(shipment.getId());
+        Shipment compare = shipmentRepository.saveShipment(shipment);
         assertEquals(shipment, compare);
-        assertEquals(shipment.getId(), compare.getId());
-        assertEquals(shipment.getOrderId(), compare.getOrderId());
-        assertEquals(shipment.getStatus(), compare.getStatus());
-    }
-    @Test
-    void testSaveShipmentWithExistingId() {
-        Shipment shipment = shipments.get(0);
-        shipmentRepository.saveShipment(shipment);
-        Shipment compare = shipmentRepository.findById(shipment.getId());
-        assertEquals(shipment, compare);
-        assertEquals(shipment.getId(), compare.getId());
-        assertEquals(shipment.getOrderId(), compare.getOrderId());
-        assertEquals(shipment.getStatus(), compare.getStatus());
-
-        assertNull(shipmentRepository.saveShipment(shipment));
+        verify(entityManager, times(1)).persist(shipment);
     }
 
     @Test
     void testDeleteShipment() {
         Shipment shipment = shipments.get(0);
-        shipmentRepository.saveShipment(shipment);
-        Shipment compare = shipmentRepository.findById(shipment.getId());
+        when(entityManager.find(Shipment.class, shipment.getId())).thenReturn(shipment);
+        Shipment compare = shipmentRepository.deleteShipment(shipment.getId());
         assertEquals(shipment, compare);
-        assertEquals(shipment.getId(), compare.getId());
-        assertEquals(shipment.getOrderId(), compare.getOrderId());
-        assertEquals(shipment.getStatus(), compare.getStatus());
-
-        assertEquals(shipment,shipmentRepository.deleteShipment(shipment.getId()));
-        assertNull(shipmentRepository.findById(shipment.getId()));
+        verify(entityManager, times(1)).remove(shipment);
     }
 
-    @Test
-    void testDeleteShipmentWithNonExistingId() {
-        Shipment shipment = shipments.get(0);
-        shipmentRepository.saveShipment(shipment);
-        Shipment compare = shipmentRepository.findById(shipment.getId());
-        assertEquals(shipment, compare);
-        assertEquals(shipment.getId(), compare.getId());
-        assertEquals(shipment.getOrderId(), compare.getOrderId());
-        assertEquals(shipment.getStatus(), compare.getStatus());
-
-        assertNull(shipmentRepository.deleteShipment("3"));
-    }
 
     @Test
     void testFindById() {
         Shipment shipment = shipments.get(0);
-        shipmentRepository.saveShipment(shipment);
-        Shipment compare = shipmentRepository.findById(shipment.getId());
-        assertEquals(shipment, compare);
-        assertEquals(shipment.getId(), compare.getId());
-        assertEquals(shipment.getOrderId(), compare.getOrderId());
-        assertEquals(shipment.getStatus(), compare.getStatus());
+        when(entityManager.find(Shipment.class, shipment.getId())).thenReturn(shipment);
+        assertEquals(shipment, shipmentRepository.findById(shipment.getId()));
     }
 
-    @Test
-    void testFindByIdWithNonExistingId() {
-        Shipment shipment = shipments.get(0);
-        shipmentRepository.saveShipment(shipment);
-        Shipment compare = shipmentRepository.findById(shipment.getId());
-        assertEquals(shipment, compare);
-        assertEquals(shipment.getId(), compare.getId());
-        assertEquals(shipment.getOrderId(), compare.getOrderId());
-        assertEquals(shipment.getStatus(), compare.getStatus());
-
-        assertNull(shipmentRepository.findById("3"));
-    }
 
     @Test
     void testFindByOrderId() {
         Shipment shipment = shipments.get(0);
-        shipmentRepository.saveShipment(shipment);
-        Shipment compare = shipmentRepository.findByOrderId(shipment.getOrderId());
-        assertEquals(shipment, compare);
-        assertEquals(shipment.getId(), compare.getId());
-        assertEquals(shipment.getOrderId(), compare.getOrderId());
-        assertEquals(shipment.getStatus(), compare.getStatus());
+        TypedQuery<Shipment> query = mock(TypedQuery.class);
+        when(entityManager.createQuery("SELECT s FROM Shipment s WHERE s.orderId = :orderId", Shipment.class)).thenReturn(query);
+        when(query.setParameter("orderId", shipment.getOrderId())).thenReturn(query);
+        when(query.getSingleResult()).thenReturn(shipment);
+        assertEquals(shipment, shipmentRepository.findByOrderId(shipment.getOrderId()));
     }
 
     @Test
-    void testFindByOrderIdWithNonExistingOrderId() {
-        Shipment shipment = shipments.get(0);
-        shipmentRepository.saveShipment(shipment);
-        Shipment compare = shipmentRepository.findByOrderId(shipment.getOrderId());
-        assertEquals(shipment, compare);
-        assertEquals(shipment.getId(), compare.getId());
-        assertEquals(shipment.getOrderId(), compare.getOrderId());
-        assertEquals(shipment.getStatus(), compare.getStatus());
-
-        assertNull(shipmentRepository.findByOrderId("3"));
-    }
-
-    @Test
-    void testFindAll(){
-        Shipment shipment1 = shipments.get(0);
-        Shipment shipment2 = shipments.get(1);
-        shipmentRepository.saveShipment(shipment1);
-        shipmentRepository.saveShipment(shipment2);
-        List<Shipment> compare = shipmentRepository.findAll();
-        assertEquals(shipment1, compare.get(0));
-        assertEquals(shipment2, compare.get(1));
-        assertEquals(compare.size(), 2);
+    void testFindAll() {
+        TypedQuery<Shipment> query = mock(TypedQuery.class);
+        when(entityManager.createQuery("SELECT s FROM Shipment s", Shipment.class)).thenReturn(query);
+        when(query.getResultList()).thenReturn(shipments);
+        assertEquals(shipments, shipmentRepository.findAll());
     }
 }
