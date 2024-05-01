@@ -27,6 +27,14 @@ public class ShipmentTest {
     }
 
     @Test
+    void testCreateWithOrderId() {
+        Shipment shipment = shipmentFactory.create("1");
+        assertNotNull(shipment.getId());
+        assertEquals("1", shipment.getOrderId());
+        assertTrue(ShippingStatus.contains(shipment.getStatus()));
+    }
+
+    @Test
     void testCreateWithIdOrderIdAndStatus() {
         Shipment shipment = shipmentFactory.create("1", "1", ShippingStatus.DIKIRIM.getValue());
         assertEquals("1", shipment.getId());
