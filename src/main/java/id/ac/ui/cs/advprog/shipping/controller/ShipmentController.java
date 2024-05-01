@@ -1,56 +1,102 @@
 package id.ac.ui.cs.advprog.shipping.controller;
 
+import enums.ShippingStatus;
 import id.ac.ui.cs.advprog.shipping.factory.ShipmentFactory;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
 import id.ac.ui.cs.advprog.shipping.service.ShipmentService;
-import id.ac.ui.cs.advprog.shipping.service.ShipmentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/shipment")
 public class ShipmentController {
-    private ShipmentFactory shipmentFactory = new ShipmentFactory();
+    private final ShipmentFactory shipmentFactory = new ShipmentFactory();
     @Autowired
     private ShipmentService shipmentService;
+    private static final String NOTFOUNDMESSAGE = "Shipment not found";
+    private static final String INVALIDSTATUSMESSAGE = "Invalid status";
+    private static final String SUCCESSUPDATEMESSAGE = "Shipment status updated successfully";
 
     @PostMapping("/create/{orderId}")
-    public ResponseEntity<Shipment> createShipment(@PathVariable("orderId") String orderId) {
-        Shipment shipment = shipmentFactory.create(orderId);
-        return new ResponseEntity<>(shipmentService.saveShipment(shipment), HttpStatus.CREATED);
+    public ResponseEntity<Object> createShipment(@PathVariable("orderId") String orderId) {
+        try {
+            Shipment shipment = shipmentFactory.create(orderId);
+            Shipment savedShipment = shipmentService.saveShipment(shipment);
+            return new ResponseEntity<>(savedShipment, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<Shipment> getShipment(@PathVariable("id") String id) {
-        return new ResponseEntity<>(shipmentService.findById(id), HttpStatus.OK);
+    public ResponseEntity<Object> getShipment(@PathVariable("id") String id) {
+        try {
+            Shipment shipment = shipmentService.findById(id);
+            if (shipment != null) {
+                return new ResponseEntity<>(shipment, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/get-by-order-id/{orderId}")
-    public ResponseEntity<Shipment> getShipmentByOrderId(@PathVariable("orderId") String orderId) {
-        return new ResponseEntity<>(shipmentService.findByOrderId(orderId), HttpStatus.OK);
+    public ResponseEntity<Object> getShipmentByOrderId(@PathVariable("orderId") String orderId) {
+        try {
+            Shipment shipment = shipmentService.findByOrderId(orderId);
+            return new ResponseEntity<>(shipment, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<Iterable<Shipment>> getAllShipments() {
-        return new ResponseEntity<>(shipmentService.getAllShipments(), HttpStatus.OK);
+    public ResponseEntity<Object> getAllShipments() {
+        Iterable<Shipment> shipments = shipmentService.getAllShipments();
+        if (ObjectUtils.isEmpty(shipments)) {
+            return new ResponseEntity<>("No Shipments yet", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(shipments, HttpStatus.OK);
+        }
     }
 
+
     @PostMapping("/update-status/{id}/{status}")
-    public ResponseEntity<Shipment> updateShipmentStatus(@PathVariable("id") String id, @PathVariable("status") String status) {
+    public ResponseEntity<Object> updateShipmentStatus(@PathVariable("id") String id, @PathVariable("status") String status) {
         Shipment shipment = shipmentService.findById(id);
-        shipment.setStatus(status);
-        return new ResponseEntity<>(shipmentService.saveShipment(shipment), HttpStatus.OK);
+        if (!ShippingStatus.contains(status)) {
+            return new ResponseEntity<>(INVALIDSTATUSMESSAGE, HttpStatus.BAD_REQUEST);
+        }
+        if (shipment != null) {
+            shipment.setStatus(status);
+            shipmentService.saveShipment(shipment);
+            return new ResponseEntity<>(SUCCESSUPDATEMESSAGE, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/update-status-order/{orderId}/{status}")
-    public ResponseEntity<Shipment> updateShipmentStatusByOrderId(@PathVariable("orderId") String orderId, @PathVariable("status") String status) {
-        Shipment shipment = shipmentService.findByOrderId(orderId);
-        shipment.setStatus(status);
-        return new ResponseEntity<>(shipmentService.saveShipment(shipment), HttpStatus.OK);
+    public ResponseEntity<Object> updateShipmentStatusByOrderId(@PathVariable("orderId") String orderId, @PathVariable("status") String status) {
+        if (!ShippingStatus.contains(status)) {
+            return new ResponseEntity<>(INVALIDSTATUSMESSAGE, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            Shipment shipment = shipmentService.findByOrderId(orderId);
+            shipment.setStatus(status);
+            shipmentService.saveShipment(shipment);
+            return new ResponseEntity<>(SUCCESSUPDATEMESSAGE, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     @GetMapping("/")
     public String trackingPage() {
