@@ -1,9 +1,12 @@
 package id.ac.ui.cs.advprog.shipping.service;
 
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
-import id.ac.ui.cs.advprog.shipping.model.ShipmentRepository;
+import id.ac.ui.cs.advprog.shipping.repository.ShipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class ShipmentServiceImpl implements ShipmentService {
@@ -12,21 +15,41 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     public Shipment findById(String id) {
-        return null;
+        return shipmentRepository.findById(id);
     }
+
     @Override
-    public Shipment createShipment(String id, String orderId, String status) {
-        return null;
+    public Shipment findByOrderId(String orderId) {
+        return shipmentRepository.findByOrderId(orderId);
     }
+
     @Override
-    public Shipment createShipment(String id, String orderId) {
-        return null;
+    public Shipment saveShipment(Shipment shipment) {
+        if (shipmentRepository.findById(shipment.getId()) == null) {
+            return shipmentRepository.saveShipment(shipment);
+        } else {
+            return null;
+        }
     }
+
     @Override
-    public Shipment editShipment(String id, String orderId, String status) {
-        return null;
+    public Shipment deleteShipment(String id) {
+        return shipmentRepository.deleteShipment(id);
     }
+
     @Override
-    public void deleteShipment(String id) {
+    public List<Shipment> getAllShipments() {
+        return shipmentRepository.findAll();
+    }
+
+    @Override
+    public Shipment setShipmentStatus(String id, String status) {
+        Shipment shipmentToChange = shipmentRepository.findById(id);
+        if (shipmentToChange != null) {
+            shipmentToChange.setStatus(status);
+            return shipmentRepository.saveShipment(shipmentToChange);
+        } else {
+            throw new NoSuchElementException();
+        }
     }
 }
