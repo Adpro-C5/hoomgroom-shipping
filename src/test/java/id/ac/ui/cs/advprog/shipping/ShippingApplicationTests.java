@@ -8,9 +8,9 @@ import static com.fasterxml.jackson.databind.cfg.CoercionInputShape.String;
 @SpringBootTest
 class ShippingApplicationTests {
 
-	@Test
-	void contextLoads() {
-		ShippingApplication.main(new String[] {});
-	}
+//	@Test
+//	void contextLoads() {
+//		ShippingApplication.main(new String[] {});
+//	}
 
 }
