@@ -24,29 +24,21 @@ public class ShipmentController {
 
     @PostMapping("/create/{orderId}")
     public ResponseEntity<Object> createShipment(@PathVariable("orderId") String orderId) {
-        try {
-            if(orderId == null || orderId.isEmpty()){
-                return new ResponseEntity<>("Order ID cannot be empty", HttpStatus.BAD_REQUEST);
-            }
-            Shipment shipment = shipmentFactory.create(orderId);
-            Shipment savedShipment = shipmentService.saveShipment(shipment);
-            return new ResponseEntity<>(savedShipment, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        if(orderId == null || orderId.isEmpty()){
+            return new ResponseEntity<>("Order ID cannot be empty", HttpStatus.BAD_REQUEST);
         }
+        Shipment shipment = shipmentFactory.create(orderId);
+        Shipment savedShipment = shipmentService.saveShipment(shipment);
+        return new ResponseEntity<>(savedShipment, HttpStatus.CREATED);
     }
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> getShipment(@PathVariable("id") String id) {
-        try {
-            Shipment shipment = shipmentService.findById(id);
-            if (shipment != null) {
-                return new ResponseEntity<>(shipment, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        Shipment shipment = shipmentService.findById(id);
+        if (shipment != null) {
+            return new ResponseEntity<>(shipment, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -99,17 +91,6 @@ public class ShipmentController {
         } catch (Exception e) {
             return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-
-    @GetMapping("/")
-    public String trackingPage() {
-        return "trackShippingPage";
-    }
-
-    @GetMapping("/result/{id}")
-    public String trackingResultPage(@PathVariable("id") String id){
-        return "resultPage";
     }
 
 }

@@ -106,8 +106,15 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testCreateShipmentInvalidOrderId() {
+    void testCreateShipmentNulldOrderId() {
         String orderId = null;
+        ResponseEntity<Object> responseEntity = shipmentController.createShipment(orderId);
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+    }
+
+    @Test
+    void testCreateShipmentInvalidOrderId() {
+        String orderId = "";
         ResponseEntity<Object> responseEntity = shipmentController.createShipment(orderId);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
@@ -179,5 +186,17 @@ class ShipmentControllerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
         assertEquals("Shipment not found", responseEntity.getBody());
+    }
+
+    @Test
+    void testUpdateOrderShipmentStatusInvalidStatus() {
+        String id = "1";
+        String invalidStatus = "InvalidStatus";
+        when(shipmentService.findByOrderId(id)).thenReturn(new Shipment());
+
+        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(id, invalidStatus);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("Invalid status", responseEntity.getBody());
     }
 }
