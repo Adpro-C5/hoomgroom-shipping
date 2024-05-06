@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/shipment")
 public class ShipmentController {
     private final ShipmentFactory shipmentFactory = new ShipmentFactory();
@@ -24,6 +25,9 @@ public class ShipmentController {
     @PostMapping("/create/{orderId}")
     public ResponseEntity<Object> createShipment(@PathVariable("orderId") String orderId) {
         try {
+            if(orderId == null || orderId.isEmpty()){
+                return new ResponseEntity<>("Order ID cannot be empty", HttpStatus.BAD_REQUEST);
+            }
             Shipment shipment = shipmentFactory.create(orderId);
             Shipment savedShipment = shipmentService.saveShipment(shipment);
             return new ResponseEntity<>(savedShipment, HttpStatus.CREATED);
