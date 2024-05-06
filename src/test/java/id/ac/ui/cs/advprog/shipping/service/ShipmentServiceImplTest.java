@@ -122,4 +122,13 @@ class ShipmentServiceImplTest {
         verify(shipmentRepository, times(1)).findAll();
         assertEquals(shipments, result);
     }
+
+    @Test
+    void testFindByOrderIdIfFound() {
+        Shipment shipment = shipments.get(0);
+        doReturn(shipment).when(shipmentRepository).findByOrderId(shipment.getOrderId());
+        Shipment result = shipmentService.findByOrderId(shipment.getOrderId());
+        verify(shipmentRepository, times(1)).findByOrderId(shipment.getOrderId());
+        assertEquals(shipment, result);
+    }
 }
