@@ -9,7 +9,6 @@ import java.util.UUID;
 
 
 @Entity
-@Builder
 @Getter
 @Table(name = "shipment")
 public class Shipment {
