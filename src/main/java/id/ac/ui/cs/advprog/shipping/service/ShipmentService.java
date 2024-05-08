@@ -3,12 +3,13 @@ package id.ac.ui.cs.advprog.shipping.service;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface ShipmentService {
-    public Shipment findById(String id);
-    public Shipment findByOrderId(String orderId);
-    public Shipment saveShipment(Shipment shipment);
-    public Shipment deleteShipment(String id);
-    public List<Shipment> getAllShipments();
-    public Shipment setShipmentStatus(String id, String status);
+    public CompletableFuture<Shipment> findById(String id);
+    public CompletableFuture<Shipment> findByOrderId(String orderId);
+    public CompletableFuture<Shipment> saveShipment(Shipment shipment);
+    public CompletableFuture<Shipment> deleteShipment(String id);
+    public CompletableFuture<List<Shipment>> getAllShipments();
+    public CompletableFuture<Shipment> setShipmentStatus(String id, String status);
 }
