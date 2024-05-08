@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -31,10 +34,11 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testCreateShipment() {
+    void testCreateShipment() throws ExecutionException, InterruptedException {
         String orderId = "123";
         Shipment shipment = new Shipment();
-        when(shipmentService.saveShipment(any(Shipment.class))).thenReturn(shipment);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
+        when(shipmentService.saveShipment(any(Shipment.class))).thenReturn(futureShipment);
 
         ResponseEntity<Object> responseEntity = shipmentController.createShipment(orderId);
 
@@ -43,10 +47,11 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testGetShipment() {
+    void testGetShipment() throws ExecutionException, InterruptedException {
         String id = "1";
         Shipment shipment = new Shipment();
-        when(shipmentService.findById(id)).thenReturn(shipment);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
+        when(shipmentService.findById(id)).thenReturn(futureShipment);
 
         ResponseEntity<Object> responseEntity = shipmentController.getShipment(id);
 
@@ -55,10 +60,11 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testGetShipmentByOrderId() {
+    void testGetShipmentByOrderId() throws ExecutionException, InterruptedException {
         String orderId = "123";
         Shipment shipment = new Shipment();
-        when(shipmentService.findByOrderId(orderId)).thenReturn(shipment);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
+        when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
 
         ResponseEntity<Object> responseEntity = shipmentController.getShipmentByOrderId(orderId);
 
@@ -67,9 +73,10 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testGetAllShipments() {
+    void testGetAllShipments() throws ExecutionException, InterruptedException {
         List<Shipment> shipments = Collections.singletonList(new Shipment());
-        when(shipmentService.getAllShipments()).thenReturn(shipments);
+        CompletableFuture<List<Shipment>> futureShipments = CompletableFuture.completedFuture(shipments);
+        when(shipmentService.getAllShipments()).thenReturn(futureShipments);
 
         ResponseEntity<Object> responseEntity = shipmentController.getAllShipments();
 
@@ -78,12 +85,13 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatus() {
+    void testUpdateShipmentStatus() throws ExecutionException, InterruptedException {
         String id = "1";
         String status = ShippingStatus.DIKIRIM.toString();
         Shipment shipment = new Shipment();
         shipment.setStatus(status);
-        when(shipmentService.findById(id)).thenReturn(shipment);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
+        when(shipmentService.findById(id)).thenReturn(futureShipment);
 
         ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatus(id, status);
 
@@ -92,12 +100,13 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatusByOrderId() {
+    void testUpdateShipmentStatusByOrderId() throws ExecutionException, InterruptedException {
         String orderId = "123";
         String status = ShippingStatus.DIKIRIM.toString();
         Shipment shipment = new Shipment();
         shipment.setStatus(status);
-        when(shipmentService.findByOrderId(orderId)).thenReturn(shipment);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
+        when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
 
         ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(orderId, status);
 
@@ -106,23 +115,24 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testCreateShipmentNulldOrderId() {
+    void testCreateShipmentNullOrderId() throws ExecutionException, InterruptedException {
         String orderId = null;
         ResponseEntity<Object> responseEntity = shipmentController.createShipment(orderId);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
 
     @Test
-    void testCreateShipmentInvalidOrderId() {
+    void testCreateShipmentInvalidOrderId() throws ExecutionException, InterruptedException {
         String orderId = "";
         ResponseEntity<Object> responseEntity = shipmentController.createShipment(orderId);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
 
     @Test
-    void testGetShipmentNotFound() {
+    void testGetShipmentNotFound() throws ExecutionException, InterruptedException {
         String id = "999";
-        when(shipmentService.findById(id)).thenReturn(null);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(null);
+        when(shipmentService.findById(id)).thenReturn(futureShipment);
 
         ResponseEntity<Object> responseEntity = shipmentController.getShipment(id);
 
@@ -131,9 +141,12 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testGetShipmentByOrderIdNotFound() {
+    void testGetShipmentByOrderIdNotFound() throws ExecutionException, InterruptedException {
         String orderId = "invalidOrderId";
-        when(shipmentService.findByOrderId(orderId)).thenThrow(new RuntimeException("Internal Server Error"));
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.supplyAsync(() -> {
+            throw new RuntimeException("Internal Server Error");
+        });
+        when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
 
         ResponseEntity<Object> responseEntity = shipmentController.getShipmentByOrderId(orderId);
 
@@ -142,9 +155,10 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testGetAllShipmentsNoShipments() {
+    void testGetAllShipmentsNoShipments() throws ExecutionException, InterruptedException {
         List<Shipment> shipments = Collections.emptyList();
-        when(shipmentService.getAllShipments()).thenReturn(shipments);
+        CompletableFuture<List<Shipment>> futureShipments = CompletableFuture.completedFuture(shipments);
+        when(shipmentService.getAllShipments()).thenReturn(futureShipments);
 
         ResponseEntity<Object> responseEntity = shipmentController.getAllShipments();
 
@@ -153,10 +167,11 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatusInvalidStatus() {
+    void testUpdateShipmentStatusInvalidStatus() throws ExecutionException, InterruptedException {
         String id = "1";
         String invalidStatus = "InvalidStatus";
-        when(shipmentService.findById(id)).thenReturn(new Shipment());
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(new Shipment());
+        when(shipmentService.findById(id)).thenReturn(futureShipment);
 
         ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatus(id, invalidStatus);
 
@@ -165,10 +180,11 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatusNotFound() {
+    void testUpdateShipmentStatusNotFound() throws ExecutionException, InterruptedException {
         String id = "999";
         String status = ShippingStatus.DIKIRIM.toString();
-        when(shipmentService.findById(id)).thenReturn(null);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(null);
+        when(shipmentService.findById(id)).thenReturn(futureShipment);
 
         ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatus(id, status);
 
@@ -177,10 +193,11 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatusByOrderIdNotFound() {
+    void testUpdateShipmentStatusByOrderIdNotFound() throws ExecutionException, InterruptedException {
         String orderId = "999";
         String status = ShippingStatus.DIKIRIM.toString();
-        when(shipmentService.findByOrderId(orderId)).thenReturn(null);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(null);
+        when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
 
         ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(orderId, status);
 
@@ -189,10 +206,11 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateOrderShipmentStatusInvalidStatus() {
+    void testUpdateOrderShipmentStatusInvalidStatus() throws ExecutionException, InterruptedException {
         String id = "1";
         String invalidStatus = "InvalidStatus";
-        when(shipmentService.findByOrderId(id)).thenReturn(new Shipment());
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(new Shipment());
+        when(shipmentService.findByOrderId(id)).thenReturn(futureShipment);
 
         ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(id, invalidStatus);
 
