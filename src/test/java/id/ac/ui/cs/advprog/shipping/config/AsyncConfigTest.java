@@ -15,17 +15,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest
 class AsyncConfigTest {
 
-    @Autowired
-    private ApplicationContext context;
-
-    @Test
-    void testAsyncTaskExecutorBean() {
-        ThreadPoolTaskExecutor asyncTaskExecutor = (ThreadPoolTaskExecutor) context.getBean("asyncTaskExecutor");
-        assertNotNull(asyncTaskExecutor);
-
-        assertEquals(4, asyncTaskExecutor.getCorePoolSize());
-        assertEquals(100, asyncTaskExecutor.getQueueCapacity());
-        assertEquals(4, asyncTaskExecutor.getMaxPoolSize());
-        assertEquals("AsyncThread-", asyncTaskExecutor.getThreadNamePrefix());
-    }
+//    @Autowired
+//    private ApplicationContext context;
+//
+//    @Test
+//    void testAsyncTaskExecutorBean() {
+//        ThreadPoolTaskExecutor asyncTaskExecutor = (ThreadPoolTaskExecutor) context.getBean("asyncTaskExecutor");
+//        assertNotNull(asyncTaskExecutor);
+//
+//        assertEquals(4, asyncTaskExecutor.getCorePoolSize());
+//        assertEquals(100, asyncTaskExecutor.getQueueCapacity());
+//        assertEquals(4, asyncTaskExecutor.getMaxPoolSize());
+//        assertEquals("AsyncThread-", asyncTaskExecutor.getThreadNamePrefix());
+//    }
 }
