@@ -68,7 +68,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/hoomgroom-shipping
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: Hello123
+          SPRING_DATASOURCE_URL: ${{ secrets.JDBC_DATABASE_URL }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.JDBC_DATABASE_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD }}
         run: chmod +x ./gradlew && ./gradlew build sonar --info
