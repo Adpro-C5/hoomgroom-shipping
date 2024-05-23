@@ -3,7 +3,6 @@ name: SonarCloud
 on:
   push:
     branches:
-      - feat/shipping
       - main
 
   pull_request:
