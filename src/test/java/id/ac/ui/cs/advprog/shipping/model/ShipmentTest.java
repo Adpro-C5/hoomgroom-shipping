@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.shipping.model;
 
 import enums.ShippingStatus;
+import enums.TransportationType;
 import id.ac.ui.cs.advprog.shipping.factory.ShipmentFactory;
 import org.junit.jupiter.api.Test;
 
@@ -60,6 +61,21 @@ class ShipmentTest {
         Shipment shipment = shipmentFactory.create("1", "1");
         assertThrows(IllegalArgumentException.class, () -> {
             shipment.setStatus("HELLO");
+        });
+    }
+
+    @Test
+    void setValidTransportationType(){
+        Shipment shipment = shipmentFactory.create("1", "1");
+        shipment.setTransportationType(TransportationType.TRUK.getValue());
+        assertEquals(TransportationType.TRUK.getValue(),shipment.getTransportationType());
+    }
+
+    @Test
+    void setInvalidTransportationType(){
+        Shipment shipment = shipmentFactory.create("1", "1");
+        assertThrows(IllegalArgumentException.class, () -> {
+            shipment.setTransportationType("HELLO");
         });
     }
 }
