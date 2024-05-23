@@ -88,4 +88,20 @@ public class ShipmentServiceImpl implements ShipmentService {
             throw new NoSuchElementException("Shipment with id " + id + " not found");
         }
     }
+
+    @Override
+    @Async("asyncTaskExecutor")
+    public CompletableFuture<Shipment> setShipmentTransportationType(String id, String transportationType) {
+        logger.info("setShipmentTransportationType started for shipment with id {}", id);
+        Shipment shipmentToChange = shipmentRepository.findById(id);
+        if (shipmentToChange != null) {
+            shipmentToChange.setTransportationType(transportationType);
+            Shipment updatedShipment = shipmentRepository.saveShipment(shipmentToChange);
+            logger.info("setShipmentTransportationType completed");
+            return CompletableFuture.completedFuture(updatedShipment);
+        } else {
+            logger.error("Shipment with id {} not found", id);
+            throw new NoSuchElementException("Shipment with id " + id + " not found");
+        }
+    }
 }

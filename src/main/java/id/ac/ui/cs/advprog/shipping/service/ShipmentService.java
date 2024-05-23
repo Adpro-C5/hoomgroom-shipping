@@ -12,4 +12,5 @@ public interface ShipmentService {
     public CompletableFuture<Shipment> deleteShipment(String id);
     public CompletableFuture<List<Shipment>> getAllShipments();
     public CompletableFuture<Shipment> setShipmentStatus(String id, String status);
+    public CompletableFuture<Shipment> setShipmentTransportationType(String id, String transportationType);
 }

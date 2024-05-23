@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.shipping.model;
 
 import enums.ShippingStatus;
+import enums.TransportationType;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -18,6 +19,8 @@ public class Shipment {
     String orderId;
     @Column(name = "status",nullable = false)
     String status;
+    @Column(name = "transportationType",nullable = true)
+    String transportationType;
 
     public Shipment() {
         this.id = UUID.randomUUID().toString();
@@ -48,6 +51,14 @@ public class Shipment {
             this.status = status;
         } else {
             throw new IllegalArgumentException("Invalid status");
+        }
+    }
+
+    public void setTransportationType(String transportationType) {
+        if(TransportationType.contains(transportationType)){
+            this.transportationType = transportationType;
+        } else {
+            throw new IllegalArgumentException("Invalid transportation type");
         }
     }
 }

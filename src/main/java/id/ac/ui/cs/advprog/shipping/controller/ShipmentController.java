@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.shipping.controller;
 
 import enums.ShippingStatus;
+import enums.TransportationType;
 import id.ac.ui.cs.advprog.shipping.factory.ShipmentFactory;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
 import id.ac.ui.cs.advprog.shipping.service.ShipmentService;
@@ -24,7 +25,8 @@ public class ShipmentController {
     }
     private static final String NOTFOUNDMESSAGE = "Shipment not found";
     private static final String INVALIDSTATUSMESSAGE = "Invalid status";
-    private static final String SUCCESSUPDATEMESSAGE = "Shipment status updated successfully";
+    private static final String INVALIDTRANSPORTATIONTYPEMESSAGE = "Invalid transportation type";
+    private static final String SUCCESSUPDATEMESSAGE = "Shipment updated successfully";
 
     @PostMapping("/create/{orderId}")
     public ResponseEntity<Object> createShipment(@PathVariable("orderId") String orderId) throws ExecutionException, InterruptedException {
@@ -116,4 +118,37 @@ public class ShipmentController {
         }
     }
 
+    @PostMapping("/set-transportation-type/{orderId}/{transportationType}")
+    public ResponseEntity<Object> setShipmentTransportationTypeByOrderId(@PathVariable("orderId") String orderId, @PathVariable("transportationType") String transportationType) {
+        if(!TransportationType.contains(transportationType)){
+            return new ResponseEntity<>(INVALIDTRANSPORTATIONTYPEMESSAGE, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            Shipment shipment = shipmentService.findByOrderId(orderId).get();
+            shipmentService.setShipmentTransportationType(shipment.getId(), transportationType);
+            return new ResponseEntity<>(SUCCESSUPDATEMESSAGE, HttpStatus.OK);
+        } catch (Exception e) {
+            Thread.currentThread().interrupt();
+            return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/set-transportation-type/{id}/{transportationType}")
+    public ResponseEntity<Object> setShipmentTransportationType(@PathVariable("id") String id, @PathVariable("transportationType") String transportationType) {
+        try{
+            Shipment shipment = shipmentService.findById(id).get();
+            if (!TransportationType.contains(transportationType)) {
+                return new ResponseEntity<>(INVALIDTRANSPORTATIONTYPEMESSAGE, HttpStatus.BAD_REQUEST);
+            }
+            if (shipment != null) {
+                shipmentService.setShipmentTransportationType(id, transportationType);
+                return new ResponseEntity<>(SUCCESSUPDATEMESSAGE, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            Thread.currentThread().interrupt();
+            return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
