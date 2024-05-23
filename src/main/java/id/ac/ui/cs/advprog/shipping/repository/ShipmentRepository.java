@@ -26,8 +26,10 @@ public class ShipmentRepository {
             entityManager.persist(shipment);
             return shipment;
         } else {
-            entityManager.merge(shipment);
-            return null;
+            return entityManager.createQuery("UPDATE Shipment s SET s.status = :status WHERE s.id = :id", Shipment.class)
+                    .setParameter("status", shipment.getStatus())
+                    .setParameter("id", shipment.getId())
+                    .getSingleResult();
         }
     }
     @Transactional
