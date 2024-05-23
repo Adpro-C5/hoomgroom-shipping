@@ -38,7 +38,7 @@ class ShipmentRepositoryTest {
 
     @Test
     void testSaveShipment() {
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         Shipment compare = shipmentRepository.saveShipment(shipment);
         assertEquals(shipment, compare);
         verify(entityManager, times(1)).persist(shipment);
@@ -46,7 +46,7 @@ class ShipmentRepositoryTest {
 
     @Test
     void testDeleteShipment() {
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         when(entityManager.find(Shipment.class, shipment.getId())).thenReturn(shipment);
         Shipment compare = shipmentRepository.deleteShipment(shipment.getId());
         assertEquals(shipment, compare);
@@ -56,7 +56,7 @@ class ShipmentRepositoryTest {
 
     @Test
     void testFindById() {
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         when(entityManager.find(Shipment.class, shipment.getId())).thenReturn(shipment);
         assertEquals(shipment, shipmentRepository.findById(shipment.getId()));
     }
@@ -64,7 +64,7 @@ class ShipmentRepositoryTest {
 
     @Test
     void testFindByOrderId() {
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         TypedQuery<Shipment> query = mock(TypedQuery.class);
         when(entityManager.createQuery("SELECT s FROM Shipment s WHERE s.orderId = :orderId", Shipment.class)).thenReturn(query);
         when(query.setParameter("orderId", shipment.getOrderId())).thenReturn(query);

@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ShipmentRepositoryTest {
+class ShipmentRepositoryFactoryTest {
     @Test
     void testCreate() {
         ShipmentRepositoryFactory shipmentRepositoryFactory = new ShipmentRepositoryFactory();
         ShipmentRepository shipmentRepository = shipmentRepositoryFactory.create();
         assertNotNull(shipmentRepository);
-        assertTrue(shipmentRepository instanceof ShipmentRepository);
+        assertInstanceOf(ShipmentRepository.class, shipmentRepository);
     }
 
     @Test
@@ -24,8 +24,9 @@ class ShipmentRepositoryTest {
         assertThrows(UnsupportedOperationException.class, () -> {
             shipmentRepositoryFactory.create("1","88");
         });
+        String status = ShippingStatus.DIKIRIM.getValue();
         assertThrows(UnsupportedOperationException.class, () -> {
-            shipmentRepositoryFactory.create("1","88", ShippingStatus.DIKIRIM.getValue());
+            shipmentRepositoryFactory.create("1","88", status);
         });
     }
 }
