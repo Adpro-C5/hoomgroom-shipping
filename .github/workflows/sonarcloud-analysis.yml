@@ -75,6 +75,4 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/hoomgroom-shipping
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: Hello123
-        run: |
-          chmod +x ./gradlew
-          ./gradlew build jacocoTestReport sonarqube --info
+        run: chmod +x ./gradlew && ./gradlew build sonar --info
