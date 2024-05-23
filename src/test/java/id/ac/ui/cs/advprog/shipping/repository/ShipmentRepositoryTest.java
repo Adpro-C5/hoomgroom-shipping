@@ -3,7 +3,6 @@ package id.ac.ui.cs.advprog.shipping.repository;
 import enums.ShippingStatus;
 import id.ac.ui.cs.advprog.shipping.factory.ShipmentFactory;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
-import id.ac.ui.cs.advprog.shipping.repository.ShipmentRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
