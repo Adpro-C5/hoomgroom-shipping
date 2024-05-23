@@ -8,8 +8,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 @Repository
 public class ShipmentRepository {
-    @Autowired
     EntityManager entityManager;
+
+    @Autowired
+    public ShipmentRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
     @Transactional
     public Shipment findById(String id) {
         return entityManager.find(Shipment.class, id);
@@ -26,10 +31,8 @@ public class ShipmentRepository {
             entityManager.persist(shipment);
             return shipment;
         } else {
-            return entityManager.createQuery("UPDATE Shipment s SET status = :status WHERE s.id = :id", Shipment.class)
-                    .setParameter("status", shipment.getStatus())
-                    .setParameter("id", shipment.getId())
-                    .getSingleResult();
+            entityManager.merge(shipment);
+            return shipment;
         }
     }
     @Transactional

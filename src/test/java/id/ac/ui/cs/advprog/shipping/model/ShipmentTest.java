@@ -2,19 +2,17 @@ package id.ac.ui.cs.advprog.shipping.model;
 
 import enums.ShippingStatus;
 import id.ac.ui.cs.advprog.shipping.factory.ShipmentFactory;
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ShipmentTest {
+class ShipmentTest {
     ShipmentFactory shipmentFactory = new ShipmentFactory();
 
     @Test
     void testCreateInvalidStatus(){
         assertThrows(IllegalArgumentException.class, () -> {
-           Shipment shipment = shipmentFactory.create("1","1","HELLO");
+           shipmentFactory.create("1","1","HELLO");
         });
     }
 

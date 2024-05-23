@@ -3,7 +3,6 @@ package id.ac.ui.cs.advprog.shipping.repository;
 import enums.ShippingStatus;
 import id.ac.ui.cs.advprog.shipping.factory.ShipmentFactory;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
-import id.ac.ui.cs.advprog.shipping.repository.ShipmentRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ShipmentRepositoryTest {
+class ShipmentRepositoryTest {
     @Mock
     private EntityManager entityManager;
 
@@ -38,7 +37,7 @@ public class ShipmentRepositoryTest {
 
     @Test
     void testSaveShipment() {
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         Shipment compare = shipmentRepository.saveShipment(shipment);
         assertEquals(shipment, compare);
         verify(entityManager, times(1)).persist(shipment);
@@ -46,7 +45,7 @@ public class ShipmentRepositoryTest {
 
     @Test
     void testDeleteShipment() {
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         when(entityManager.find(Shipment.class, shipment.getId())).thenReturn(shipment);
         Shipment compare = shipmentRepository.deleteShipment(shipment.getId());
         assertEquals(shipment, compare);
@@ -56,7 +55,7 @@ public class ShipmentRepositoryTest {
 
     @Test
     void testFindById() {
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         when(entityManager.find(Shipment.class, shipment.getId())).thenReturn(shipment);
         assertEquals(shipment, shipmentRepository.findById(shipment.getId()));
     }
@@ -64,7 +63,7 @@ public class ShipmentRepositoryTest {
 
     @Test
     void testFindByOrderId() {
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         TypedQuery<Shipment> query = mock(TypedQuery.class);
         when(entityManager.createQuery("SELECT s FROM Shipment s WHERE s.orderId = :orderId", Shipment.class)).thenReturn(query);
         when(query.setParameter("orderId", shipment.getOrderId())).thenReturn(query);

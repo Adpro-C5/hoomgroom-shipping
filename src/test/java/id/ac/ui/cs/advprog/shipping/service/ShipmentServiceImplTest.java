@@ -2,7 +2,6 @@ package id.ac.ui.cs.advprog.shipping.service;
 
 import enums.ShippingStatus;
 import id.ac.ui.cs.advprog.shipping.factory.ShipmentFactory;
-import id.ac.ui.cs.advprog.shipping.factory.ShipmentRepositoryFactory;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
 import id.ac.ui.cs.advprog.shipping.repository.ShipmentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +39,7 @@ class ShipmentServiceImplTest {
 
     @Test
     void testSaveShipment() throws ExecutionException, InterruptedException{
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         doReturn(shipment).when(shipmentRepository).saveShipment(shipment);
         Shipment result = shipmentService.saveShipment(shipment).get();
         verify(shipmentRepository,times(1)).saveShipment(shipment);
@@ -49,7 +48,7 @@ class ShipmentServiceImplTest {
 
     @Test
     void testSaveShipmentWithExistingId() throws ExecutionException, InterruptedException{
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         doReturn(shipment).when(shipmentRepository).findById(shipment.getId());
         Shipment result = shipmentService.saveShipment(shipment).get();
         verify(shipmentRepository, times(1)).findById(shipment.getId());
@@ -59,7 +58,7 @@ class ShipmentServiceImplTest {
 
     @Test
     void testSetShipmentStatus() throws ExecutionException, InterruptedException{
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         doReturn(shipment).when(shipmentRepository).findById(shipment.getId());
         doReturn(shipment).when(shipmentRepository).saveShipment(shipment);
         Shipment result = shipmentService.setShipmentStatus(shipment.getId(), ShippingStatus.DIKIRIM.toString()).get();
@@ -69,11 +68,13 @@ class ShipmentServiceImplTest {
     }
 
     @Test
-    void testSetShipmentStatusWithNonExistingShipment() throws ExecutionException, InterruptedException{
-        Shipment shipment = shipments.get(0);
+    void testSetShipmentStatusWithNonExistingShipment() {
+        Shipment shipment = shipments.getFirst();
         doReturn(null).when(shipmentRepository).findById(shipment.getId());
-        NoSuchElementException noSuchElementException = assertThrows(NoSuchElementException.class, () -> {
-            shipmentService.setShipmentStatus(shipment.getId(), ShippingStatus.DIKIRIM.toString());
+        String status = ShippingStatus.DIKIRIM.toString();
+        String id = shipment.getId();
+        assertThrows(NoSuchElementException.class, () -> {
+            shipmentService.setShipmentStatus(id, status);
         });
         verify(shipmentRepository,times(1)).findById(shipment.getId());
         verify(shipmentRepository,times(0)).saveShipment(shipment);
@@ -82,7 +83,7 @@ class ShipmentServiceImplTest {
 
     @Test
     void testDeleteShipment() throws ExecutionException, InterruptedException{
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         doReturn(shipment).when(shipmentRepository).deleteShipment(shipment.getId());
         Shipment result = shipmentService.deleteShipment(shipment.getId()).get();
         verify(shipmentRepository,times(1)).deleteShipment(shipment.getId());
@@ -91,7 +92,7 @@ class ShipmentServiceImplTest {
 
     @Test
     void testDeleteNonExistingShipment() throws ExecutionException, InterruptedException{
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         doReturn(null).when(shipmentRepository).deleteShipment(shipment.getId());
         Shipment result = shipmentService.deleteShipment(shipment.getId()).get();
         verify(shipmentRepository,times(1)).deleteShipment(shipment.getId());
@@ -100,7 +101,7 @@ class ShipmentServiceImplTest {
 
     @Test
     void testFindByIdIfFound() throws ExecutionException, InterruptedException{
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         doReturn(shipment).when(shipmentRepository).findById(shipment.getId());
         Shipment result = shipmentService.findById(shipment.getId()).get();
         verify(shipmentRepository, times(1)).findById(shipment.getId());
@@ -109,7 +110,7 @@ class ShipmentServiceImplTest {
 
     @Test
     void testFindByIdIfNotFound() throws ExecutionException, InterruptedException{
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         doReturn(null).when(shipmentRepository).findById(shipment.getId());
         Shipment result = shipmentService.findById(shipment.getId()).get();
         verify(shipmentRepository, times(1)).findById(shipment.getId());
@@ -126,7 +127,7 @@ class ShipmentServiceImplTest {
 
     @Test
     void testFindByOrderIdIfFound() throws ExecutionException, InterruptedException{
-        Shipment shipment = shipments.get(0);
+        Shipment shipment = shipments.getFirst();
         doReturn(shipment).when(shipmentRepository).findByOrderId(shipment.getOrderId());
         Shipment result = shipmentService.findByOrderId(shipment.getOrderId()).get();
         verify(shipmentRepository, times(1)).findByOrderId(shipment.getOrderId());
