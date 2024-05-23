@@ -1,7 +1,6 @@
 package id.ac.ui.cs.advprog.shipping.controller;
 
 import enums.ShippingStatus;
-import id.ac.ui.cs.advprog.shipping.controller.ShipmentController;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
 import id.ac.ui.cs.advprog.shipping.service.ShipmentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -30,7 +28,7 @@ class ShipmentControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -100,7 +98,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatusByOrderId() throws ExecutionException, InterruptedException {
+    void testUpdateShipmentStatusByOrderId() {
         String orderId = "123";
         String status = ShippingStatus.DIKIRIM.toString();
         Shipment shipment = new Shipment();
@@ -116,8 +114,7 @@ class ShipmentControllerTest {
 
     @Test
     void testCreateShipmentNullOrderId() throws ExecutionException, InterruptedException {
-        String orderId = null;
-        ResponseEntity<Object> responseEntity = shipmentController.createShipment(orderId);
+        ResponseEntity<Object> responseEntity = shipmentController.createShipment(null);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
 
@@ -193,7 +190,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatusByOrderIdNotFound() throws ExecutionException, InterruptedException {
+    void testUpdateShipmentStatusByOrderIdNotFound() {
         String orderId = "999";
         String status = ShippingStatus.DIKIRIM.toString();
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(null);
@@ -206,7 +203,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateOrderShipmentStatusInvalidStatus() throws ExecutionException, InterruptedException {
+    void testUpdateOrderShipmentStatusInvalidStatus() {
         String id = "1";
         String invalidStatus = "InvalidStatus";
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(new Shipment());
