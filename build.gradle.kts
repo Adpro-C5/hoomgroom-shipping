@@ -37,6 +37,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
 	implementation("me.paulschwarz:spring-dotenv:$dotenvVersion")
+	implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor("org.projectlombok:lombok")
