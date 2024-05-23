@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ShipmentRepositoryTest {
+class ShipmentRepositoryTest {
     @Test
     void testCreate() {
         ShipmentRepositoryFactory shipmentRepositoryFactory = new ShipmentRepositoryFactory();
