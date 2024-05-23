@@ -61,12 +61,30 @@ sonar {
 	}
 }
 
-tasks.withType<Test> {
+tasks.register<Test>("unitTest") {
+	description = "Runs unit tests."
+	group = "verification"
+
+	filter {
+		excludeTestsMatching("*FunctionalTest")
+	}
+}
+
+tasks.register<Test>("functionalTest") {
+	description = "Runs functional tests."
+	group = "verification"
+
+	filter {
+		includeTestsMatching("*FunctionalTest")
+	}
+}
+
+tasks.withType<Test>().configureEach {
 	useJUnitPlatform()
 }
 
-tasks.test {
-	filter {
+tasks.test{
+	filter{
 		excludeTestsMatching("*FunctionalTest")
 	}
 
@@ -74,5 +92,13 @@ tasks.test {
 }
 
 tasks.jacocoTestReport {
-	dependsOn(tasks.test)
+	classDirectories.setFrom(files(classDirectories.files.map {
+		fileTree(it) { exclude("**/*Application**") }
+	}))
+	dependsOn(tasks.test) // tests are required to run before generating the report
+	reports {
+		xml.required.set(true)
+		csv.required.set(true)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
 }
