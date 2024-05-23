@@ -3,17 +3,24 @@
 <br>
 
 **Deployment Link :** http://34.143.167.93/shipment
+<br><br>
 
 ## Fitur :
 
-- Membuat Shipment (C)  http://34.143.167.93/shipment/create/{orderId}
-- Memfilter Shipment (R) : 
-  - Get All Shipment (R) http://34.143.167.93/shipment/get-all
-  - Berdasarkan ID (R) http://34.143.167.93/shipment/get/{id}
-  - Berdasarkan Order ID (R) http://34.143.167.93/shipment/get-by-order-id/{orderId}
-- Mengubah Status Subscription (U) :
-  - Sesuai ID (U) http://34.143.167.93/shipment/update-status/{id}/{status}
-  - Sesuai Order ID (U) http://34.143.167.93/shipment/update-status-order/{orderId}/{status}
+- _Membuat Shipment (C)_<br>
+  http://34.143.167.93/shipment/create/{orderId}<br><br>
+- _Memfilter Shipment (R)_ : 
+  - Get All Shipment (R)<br>
+    http://34.143.167.93/shipment/get-all
+  - Berdasarkan ID (R)<br>
+    http://34.143.167.93/shipment/get/{id}
+  - Berdasarkan Order ID (R)<br>
+    http://34.143.167.93/shipment/get-by-order-id/{orderId}<br><br>
+- _Mengubah Status Subscription (U)_ :
+  - Sesuai ID (U)<br>
+    http://34.143.167.93/shipment/update-status/{id}/{status}
+  - Sesuai Order ID (U)<br>
+    http://34.143.167.93/shipment/update-status-order/{orderId}/{status}<br><br>
 
 ## Informasi Microservice
 ### Design Pattern
