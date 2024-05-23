@@ -86,8 +86,7 @@ public class ShipmentController {
                 return new ResponseEntity<>(INVALIDSTATUSMESSAGE, HttpStatus.BAD_REQUEST);
             }
             if (shipment != null) {
-                shipment.setStatus(status);
-                shipmentService.saveShipment(shipment);
+                shipmentService.setShipmentStatus(id, status);
                 return new ResponseEntity<>(SUCCESSUPDATEMESSAGE, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.NOT_FOUND);
@@ -104,8 +103,7 @@ public class ShipmentController {
         }
         try {
             Shipment shipment = shipmentService.findByOrderId(orderId).get();
-            shipment.setStatus(status);
-            shipmentService.saveShipment(shipment);
+            shipmentService.setShipmentStatus(shipment.getId(), status);
             return new ResponseEntity<>(SUCCESSUPDATEMESSAGE, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
