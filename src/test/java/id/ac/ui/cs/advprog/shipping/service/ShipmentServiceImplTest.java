@@ -2,7 +2,6 @@ package id.ac.ui.cs.advprog.shipping.service;
 
 import enums.ShippingStatus;
 import id.ac.ui.cs.advprog.shipping.factory.ShipmentFactory;
-import id.ac.ui.cs.advprog.shipping.factory.ShipmentRepositoryFactory;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
 import id.ac.ui.cs.advprog.shipping.repository.ShipmentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,8 +71,10 @@ class ShipmentServiceImplTest {
     void testSetShipmentStatusWithNonExistingShipment() throws ExecutionException, InterruptedException{
         Shipment shipment = shipments.get(0);
         doReturn(null).when(shipmentRepository).findById(shipment.getId());
+        String status = ShippingStatus.DIKIRIM.toString();
+        String id = shipment.getId();
         NoSuchElementException noSuchElementException = assertThrows(NoSuchElementException.class, () -> {
-            shipmentService.setShipmentStatus(shipment.getId(), ShippingStatus.DIKIRIM.toString());
+            shipmentService.setShipmentStatus(id, status);
         });
         verify(shipmentRepository,times(1)).findById(shipment.getId());
         verify(shipmentRepository,times(0)).saveShipment(shipment);
