@@ -57,6 +57,14 @@ class ShipmentTest {
     }
 
     @Test
+    void setValidStatusToDikirim(){
+        Shipment shipment = shipmentFactory.create("1", "1");
+        shipment.setStatus(ShippingStatus.DIKIRIM.getValue());
+        assertEquals(ShippingStatus.DIKIRIM.getValue(),shipment.getStatus());
+        assertNotNull(shipment.getNoResi());
+    }
+
+    @Test
     void setInvalidStatus(){
         Shipment shipment = shipmentFactory.create("1", "1");
         assertThrows(IllegalArgumentException.class, () -> {
