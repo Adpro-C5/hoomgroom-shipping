@@ -17,8 +17,11 @@ import org.slf4j.Logger;
 public class ShipmentServiceImpl implements ShipmentService {
     private static final Logger logger = LoggerFactory.getLogger(ShipmentServiceImpl.class);
 
+    private final ShipmentRepository shipmentRepository;
     @Autowired
-    private ShipmentRepository shipmentRepository;
+    public ShipmentServiceImpl(ShipmentRepository shipmentRepository) {
+        this.shipmentRepository = shipmentRepository;
+    }
 
     @Override
     @Async("asyncTaskExecutor")

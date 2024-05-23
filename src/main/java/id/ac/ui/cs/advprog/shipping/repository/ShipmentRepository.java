@@ -8,8 +8,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 @Repository
 public class ShipmentRepository {
-    @Autowired
     EntityManager entityManager;
+
+    @Autowired
+    public ShipmentRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
     @Transactional
     public Shipment findById(String id) {
         return entityManager.find(Shipment.class, id);

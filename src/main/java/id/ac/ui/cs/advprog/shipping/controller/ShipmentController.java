@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 
@@ -19,8 +17,11 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping("/shipment")
 public class ShipmentController {
     private final ShipmentFactory shipmentFactory = new ShipmentFactory();
+    private final ShipmentService shipmentService;
     @Autowired
-    private ShipmentService shipmentService;
+    public ShipmentController(ShipmentService shipmentService) {
+        this.shipmentService = shipmentService;
+    }
     private static final String NOTFOUNDMESSAGE = "Shipment not found";
     private static final String INVALIDSTATUSMESSAGE = "Invalid status";
     private static final String SUCCESSUPDATEMESSAGE = "Shipment status updated successfully";
@@ -35,6 +36,7 @@ public class ShipmentController {
             Shipment savedShipment = shipmentService.saveShipment(shipment).get();
             return new ResponseEntity<>(savedShipment, HttpStatus.CREATED);
         } catch (Exception e) {
+            Thread.currentThread().interrupt();
             return new ResponseEntity<>("Failed to create shipment", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -59,6 +61,7 @@ public class ShipmentController {
             Shipment shipment = shipmentService.findByOrderId(orderId).get();
             return new ResponseEntity<>(shipment, HttpStatus.OK);
         } catch (Exception e) {
+            Thread.currentThread().interrupt();
             return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -73,6 +76,7 @@ public class ShipmentController {
                 return new ResponseEntity<>(shipments, HttpStatus.OK);
             }
         } catch (Exception e) {
+            Thread.currentThread().interrupt();
             return new ResponseEntity<>("Failed to get shipments", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -92,6 +96,7 @@ public class ShipmentController {
                 return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
+            Thread.currentThread().interrupt();
             return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -106,6 +111,7 @@ public class ShipmentController {
             shipmentService.setShipmentStatus(shipment.getId(), status);
             return new ResponseEntity<>(SUCCESSUPDATEMESSAGE, HttpStatus.OK);
         } catch (Exception e) {
+            Thread.currentThread().interrupt();
             return new ResponseEntity<>(NOTFOUNDMESSAGE, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
