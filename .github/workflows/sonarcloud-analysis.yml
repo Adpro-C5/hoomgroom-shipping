@@ -4,30 +4,29 @@ on:
   push:
     branches:
       - main
-      - feat/shipping
 
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
   build:
-    name: Build and analyze
+    name: Build, analyze, and test
     runs-on: ubuntu-latest
 
     services:
       postgres:
         image: postgres:latest
         ports:
-          - 5432
+          - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: Hello123
-          POSTGRES_DB: jwt_security
+          POSTGRES_DB: hoomgroom-shipping
 
     steps:
       - uses: actions/checkout@v3
@@ -57,18 +56,25 @@ jobs:
 
       - name: Wait for PostgreSQL
         run: |
-          for i in `seq 1 30`; do
-            nc -z localhost 5433 && echo "PostgreSQL is up and running" && exit 0
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5432 -U postgres; then
+              echo "PostgreSQL is up and running"
+              break
+            fi
             echo "Waiting for PostgreSQL..."
             sleep 1
           done
-          echo "PostgreSQL failed to start" && exit 1
+          if ! pg_isready -h localhost -p 5432 -U postgres; then
+            echo "PostgreSQL failed to start" && exit 1
+          fi
 
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SPRING_DATASOURCE_URL: ${{ secrets.JDBC_DATABASE_URL }}
-          SPRING_DATASOURCE_USERNAME: ${{ secrets.JDBC_DATABASE_USERNAME }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD }}
-        run: chmod +x ./gradlew && ./gradlew build sonar --info
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/hoomgroom-shipping
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: Hello123
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build jacocoTestReport sonarqube --info
