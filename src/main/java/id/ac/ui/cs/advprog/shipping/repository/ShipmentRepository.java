@@ -26,7 +26,7 @@ public class ShipmentRepository {
             entityManager.persist(shipment);
             return shipment;
         } else {
-            return entityManager.createQuery("UPDATE Shipment s SET s.status = :status WHERE s.id = :id", Shipment.class)
+            return entityManager.createQuery("UPDATE Shipment s SET status = :status WHERE s.id = :id", Shipment.class)
                     .setParameter("status", shipment.getStatus())
                     .setParameter("id", shipment.getId())
                     .getSingleResult();
