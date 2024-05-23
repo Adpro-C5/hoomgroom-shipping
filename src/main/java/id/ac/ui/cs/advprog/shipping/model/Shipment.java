@@ -2,7 +2,6 @@ package id.ac.ui.cs.advprog.shipping.model;
 
 import enums.ShippingStatus;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.util.UUID;
