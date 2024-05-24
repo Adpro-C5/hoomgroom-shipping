@@ -14,6 +14,8 @@ class ShipmentFactoryTest {
         Shipment shipment = shipmentFactory.create();
         assertNull(shipment.getOrderId());
         assertEquals(ShippingStatus.MENUNGGU_VERIFIKASI.getValue(), shipment.getStatus());
+        assertNull(shipment.getNoResi());
+        assertNull(shipment.getTransportationType());
     }
 
     @Test
@@ -22,6 +24,8 @@ class ShipmentFactoryTest {
         Shipment shipment = shipmentFactory.create("1");
         assertEquals("1", shipment.getOrderId());
         assertEquals(ShippingStatus.MENUNGGU_VERIFIKASI.getValue(), shipment.getStatus());
+        assertNull(shipment.getNoResi());
+        assertNull(shipment.getTransportationType());
     }
 
     @Test
@@ -31,6 +35,8 @@ class ShipmentFactoryTest {
         assertEquals("1", shipment.getId());
         assertEquals("1", shipment.getOrderId());
         assertEquals(ShippingStatus.MENUNGGU_VERIFIKASI.getValue(), shipment.getStatus());
+        assertNull(shipment.getNoResi());
+        assertNull(shipment.getTransportationType());
     }
 
     @Test
@@ -40,5 +46,7 @@ class ShipmentFactoryTest {
         assertEquals("1", shipment.getId());
         assertEquals("1", shipment.getOrderId());
         assertEquals(ShippingStatus.DIKIRIM.getValue(), shipment.getStatus());
+        assertNull(shipment.getNoResi());
+        assertNull(shipment.getTransportationType());
     }
 }

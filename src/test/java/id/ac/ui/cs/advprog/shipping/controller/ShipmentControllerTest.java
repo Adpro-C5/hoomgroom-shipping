@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.shipping.controller;
 
 import enums.ShippingStatus;
+import enums.TransportationType;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
 import id.ac.ui.cs.advprog.shipping.service.ShipmentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,7 +95,7 @@ class ShipmentControllerTest {
         ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatus(id, status);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals("Shipment status updated successfully", responseEntity.getBody());
+        assertEquals("Shipment updated successfully", responseEntity.getBody());
     }
 
     @Test
@@ -109,7 +110,7 @@ class ShipmentControllerTest {
         ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(orderId, status);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals("Shipment status updated successfully", responseEntity.getBody());
+        assertEquals("Shipment updated successfully", responseEntity.getBody());
     }
 
     @Test
@@ -213,5 +214,61 @@ class ShipmentControllerTest {
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertEquals("Invalid status", responseEntity.getBody());
+    }
+
+    @Test
+    void testSetTransportationType() throws ExecutionException, InterruptedException {
+        String id = "1";
+        String transportationType = TransportationType.TRUK.getValue();
+        Shipment shipment = new Shipment();
+        shipment.setTransportationType(transportationType);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
+        when(shipmentService.findById(id)).thenReturn(futureShipment);
+
+        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationType(id, transportationType);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals("Shipment updated successfully", responseEntity.getBody());
+    }
+
+    @Test
+    void testSetTransportationTypeByOrderId() {
+        String orderId = "123";
+        String transportationType = TransportationType.TRUK.getValue();
+        Shipment shipment = new Shipment();
+        shipment.setTransportationType(transportationType);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
+        when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
+
+        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationTypeByOrderId(orderId, transportationType);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals("Shipment updated successfully", responseEntity.getBody());
+    }
+
+    @Test
+    void testSetTransportationTypeByOrderIdNotFound() {
+        String orderId = "999";
+        String transportationType = TransportationType.TRUK.getValue();
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(null);
+        when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
+
+        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationTypeByOrderId(orderId, transportationType);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+        assertEquals("Shipment not found", responseEntity.getBody());
+    }
+
+    @Test
+    void testSetTransportationTypeInvalidTransportationType() {
+        String id = "1";
+        String invalidTransportationType = "InvalidTransportationType";
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(new Shipment());
+        when(shipmentService.findById(id)).thenReturn(futureShipment);
+
+        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationType(id, invalidTransportationType);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("Invalid transportation type", responseEntity.getBody());
     }
 }
