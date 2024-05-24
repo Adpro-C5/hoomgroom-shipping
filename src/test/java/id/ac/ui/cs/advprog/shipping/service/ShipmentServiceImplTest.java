@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.shipping.service;
 
 import enums.ShippingStatus;
+import enums.TransportationType;
 import id.ac.ui.cs.advprog.shipping.factory.ShipmentFactory;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
 import id.ac.ui.cs.advprog.shipping.repository.ShipmentRepository;
@@ -132,5 +133,29 @@ class ShipmentServiceImplTest {
         Shipment result = shipmentService.findByOrderId(shipment.getOrderId()).get();
         verify(shipmentRepository, times(1)).findByOrderId(shipment.getOrderId());
         assertEquals(shipment, result);
+    }
+
+    @Test
+    void testSetTransportationType() throws ExecutionException, InterruptedException{
+        Shipment shipment = shipments.getFirst();
+        doReturn(shipment).when(shipmentRepository).findById(shipment.getId());
+        doReturn(shipment).when(shipmentRepository).saveShipment(shipment);
+        Shipment result = shipmentService.setShipmentTransportationType(shipment.getId(), TransportationType.TRUK.getValue()).get();
+        verify(shipmentRepository,times(1)).findById(shipment.getId());
+        verify(shipmentRepository,times(1)).saveShipment(shipment);
+        assertEquals(shipment, result);
+    }
+
+    @Test
+    void testSetTransportationTypeWithNonExistingShipment() {
+        Shipment shipment = shipments.getFirst();
+        doReturn(null).when(shipmentRepository).findById(shipment.getId());
+        String transportationType = TransportationType.TRUK.getValue();
+        String id = shipment.getId();
+        assertThrows(NoSuchElementException.class, () -> {
+            shipmentService.setShipmentTransportationType(id, transportationType);
+        });
+        verify(shipmentRepository,times(1)).findById(shipment.getId());
+        verify(shipmentRepository,times(0)).saveShipment(shipment);
     }
 }
