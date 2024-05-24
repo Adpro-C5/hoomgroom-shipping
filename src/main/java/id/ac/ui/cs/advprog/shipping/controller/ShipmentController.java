@@ -27,7 +27,7 @@ public class ShipmentController {
     private static final String SUCCESSUPDATEMESSAGE = "Shipment status updated successfully";
 
     @PostMapping("/create/{orderId}")
-    public ResponseEntity<Object> createShipment(@PathVariable("orderId") String orderId) throws ExecutionException, InterruptedException {
+    public ResponseEntity<Object> createShipment(@PathVariable("orderId") String orderId) {
         if (orderId == null || orderId.isEmpty()) {
             return new ResponseEntity<>("Order ID cannot be empty", HttpStatus.BAD_REQUEST);
         }
@@ -56,7 +56,7 @@ public class ShipmentController {
     }
 
     @GetMapping("/get-by-order-id/{orderId}")
-    public ResponseEntity<Object> getShipmentByOrderId(@PathVariable("orderId") String orderId) throws ExecutionException, InterruptedException{
+    public ResponseEntity<Object> getShipmentByOrderId(@PathVariable("orderId") String orderId){
         try {
             Shipment shipment = shipmentService.findByOrderId(orderId).get();
             return new ResponseEntity<>(shipment, HttpStatus.OK);
@@ -67,7 +67,7 @@ public class ShipmentController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<Object> getAllShipments() throws ExecutionException, InterruptedException {
+    public ResponseEntity<Object> getAllShipments() {
         try{
             Iterable<Shipment> shipments = shipmentService.getAllShipments().get();
             if (ObjectUtils.isEmpty(shipments)) {
@@ -83,7 +83,7 @@ public class ShipmentController {
 
 
     @PostMapping("/update-status/{id}/{status}")
-    public ResponseEntity<Object> updateShipmentStatus(@PathVariable("id") String id, @PathVariable("status") String status) throws ExecutionException, InterruptedException{
+    public ResponseEntity<Object> updateShipmentStatus(@PathVariable("id") String id, @PathVariable("status") String status){
         try{
             Shipment shipment = shipmentService.findById(id).get();
             if (!ShippingStatus.contains(status)) {
