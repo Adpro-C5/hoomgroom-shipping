@@ -41,4 +41,11 @@ REST API
 <br>
 
 ### Asynchronous Programming:
-Spring Async Annotations
+Spring Async Annotations<br><br>
+
+## Tutorial 2
+### Component Diagram
+<img src="images/component diagram.png"><br><br>
+
+### Code Diagram
+<img src="images/code diagram.png"><br><br>
