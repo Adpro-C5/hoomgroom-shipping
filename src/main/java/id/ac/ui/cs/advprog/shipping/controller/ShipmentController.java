@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RequestMapping("/shipment")
 public class ShipmentController {
     private final ShipmentFactory shipmentFactory = new ShipmentFactory();
