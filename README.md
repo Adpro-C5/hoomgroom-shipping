@@ -25,7 +25,7 @@
   - Sesuai ID (U)<br>
     http://34.143.167.93/shipment/set-transportation-type/{id}/{transportationType}<br>
   - Sesuai Order ID (U)<br>
-    http://34.143.167.93/shipment/{orderId}/{transportationType}<br><br>
+    http://34.143.167.93/shipment/set-transportation-type-order/{orderId}/{transportationType}<br><br>
 
 ## Informasi Microservice
 ### Design Pattern

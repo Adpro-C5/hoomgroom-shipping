@@ -118,7 +118,7 @@ public class ShipmentController {
         }
     }
 
-    @PostMapping("/set-transportation-type/{orderId}/{transportationType}")
+    @PostMapping("/set-transportation-type-order/{orderId}/{transportationType}")
     public ResponseEntity<Object> setShipmentTransportationTypeByOrderId(@PathVariable("orderId") String orderId, @PathVariable("transportationType") String transportationType) {
         if(!TransportationType.contains(transportationType)){
             return new ResponseEntity<>(INVALIDTRANSPORTATIONTYPEMESSAGE, HttpStatus.BAD_REQUEST);
