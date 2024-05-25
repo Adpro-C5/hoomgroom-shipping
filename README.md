@@ -43,7 +43,7 @@ REST API
 ### Asynchronous Programming:
 Spring Async Annotations<br><br>
 
-## Tutorial 2
+## Tutorial 12
 ### Component Diagram
 <img src="images/component diagram.png"><br><br>
 
