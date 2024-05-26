@@ -30,6 +30,7 @@ val seleniumJavaVersion = "4.14.1"
 val seleniumJupiterVersion = "5.0.1"
 val webdrivermanagerVersion = "5.6.3"
 val junitJupiterVersion = "5.9.1"
+val jnanoidVersion = "2.0.0"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -37,7 +38,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-actuator:$springBootVersion")
 	implementation("me.paulschwarz:spring-dotenv:$dotenvVersion")
-	implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
+	implementation("com.aventrix.jnanoid:jnanoid:$jnanoidVersion")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor("org.projectlombok:lombok")
@@ -95,7 +96,7 @@ tasks.test{
 
 tasks.jacocoTestReport {
 	classDirectories.setFrom(files(classDirectories.files.map {
-		fileTree(it) { exclude("**/*Application**") }
+		fileTree(it) { exclude("**/*Application**","**/enums/*", "**/config/*", "**/helper/*") }
 	}))
 	dependsOn(tasks.test) // tests are required to run before generating the report
 	reports {
