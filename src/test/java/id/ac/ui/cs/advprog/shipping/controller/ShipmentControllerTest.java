@@ -2,8 +2,10 @@ package id.ac.ui.cs.advprog.shipping.controller;
 
 import enums.ShippingStatus;
 import enums.TransportationType;
+import id.ac.ui.cs.advprog.shipping.helper.AuthHelper;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
 import id.ac.ui.cs.advprog.shipping.service.ShipmentService;
+import org.checkerframework.checker.units.qual.N;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,9 +22,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class ShipmentControllerTest {
+    private static final String ADMINROLE = "ADMIN";
+    private static final String UNAUTHORIZEDMESSAGE = "Unauthorized, You're not an admin";
+    private static final String INVALIDSTATUSMESSAGE = "Invalid status";
+    private static final String NOTFOUNDMESSAGE = "Shipment not found";
+    private static final String SUCCESSUPDATEMESSAGE = "Shipment updated successfully";
+    private static final String INVALIDTRANSPORTATIONTYPEMESSAGE = "Invalid transportation type";
 
     @Mock
     private ShipmentService shipmentService;
+    @Mock
+    private AuthHelper authHelper;
 
     @InjectMocks
     private ShipmentController shipmentController;
@@ -33,7 +43,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testCreateShipment() throws ExecutionException, InterruptedException {
+    void testCreateShipment() {
         String orderId = "123";
         Shipment shipment = new Shipment();
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
@@ -59,7 +69,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testGetShipmentByOrderId() throws ExecutionException, InterruptedException {
+    void testGetShipmentByOrderId() {
         String orderId = "123";
         Shipment shipment = new Shipment();
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
@@ -72,7 +82,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testGetAllShipments() throws ExecutionException, InterruptedException {
+    void testGetAllShipments() {
         List<Shipment> shipments = Collections.singletonList(new Shipment());
         CompletableFuture<List<Shipment>> futureShipments = CompletableFuture.completedFuture(shipments);
         when(shipmentService.getAllShipments()).thenReturn(futureShipments);
@@ -84,43 +94,13 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatus() throws ExecutionException, InterruptedException {
-        String id = "1";
-        String status = ShippingStatus.DIKIRIM.toString();
-        Shipment shipment = new Shipment();
-        shipment.setStatus(status);
-        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
-        when(shipmentService.findById(id)).thenReturn(futureShipment);
-
-        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatus(id, status);
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals("Shipment updated successfully", responseEntity.getBody());
-    }
-
-    @Test
-    void testUpdateShipmentStatusByOrderId() {
-        String orderId = "123";
-        String status = ShippingStatus.DIKIRIM.toString();
-        Shipment shipment = new Shipment();
-        shipment.setStatus(status);
-        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
-        when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
-
-        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(orderId, status);
-
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals("Shipment updated successfully", responseEntity.getBody());
-    }
-
-    @Test
-    void testCreateShipmentNullOrderId() throws ExecutionException, InterruptedException {
+    void testCreateShipmentNullOrderId() {
         ResponseEntity<Object> responseEntity = shipmentController.createShipment(null);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
 
     @Test
-    void testCreateShipmentInvalidOrderId() throws ExecutionException, InterruptedException {
+    void testCreateShipmentInvalidOrderId() {
         String orderId = "";
         ResponseEntity<Object> responseEntity = shipmentController.createShipment(orderId);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
@@ -135,11 +115,11 @@ class ShipmentControllerTest {
         ResponseEntity<Object> responseEntity = shipmentController.getShipment(id);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-        assertEquals("Shipment not found", responseEntity.getBody());
+        assertEquals(NOTFOUNDMESSAGE, responseEntity.getBody());
     }
 
     @Test
-    void testGetShipmentByOrderIdNotFound() throws ExecutionException, InterruptedException {
+    void testGetShipmentByOrderIdNotFound() {
         String orderId = "invalidOrderId";
         CompletableFuture<Shipment> futureShipment = CompletableFuture.supplyAsync(() -> {
             throw new RuntimeException("Internal Server Error");
@@ -149,7 +129,7 @@ class ShipmentControllerTest {
         ResponseEntity<Object> responseEntity = shipmentController.getShipmentByOrderId(orderId);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertEquals("Shipment not found", responseEntity.getBody());
+        assertEquals(NOTFOUNDMESSAGE, responseEntity.getBody());
     }
 
     @Test
@@ -165,110 +145,322 @@ class ShipmentControllerTest {
     }
 
     @Test
+    void testUpdateShipmentStatus() {
+        String id = "1";
+        String status = ShippingStatus.DIKIRIM.toString();
+        String jwtToken = "validJwtToken";
+        Shipment shipment = new Shipment();
+        shipment.setStatus(status);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
+
+        when(authHelper.getUserRole(jwtToken)).thenReturn(ADMINROLE);
+        when(shipmentService.findById(id)).thenReturn(futureShipment);
+
+        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatus(id, status, jwtToken);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(SUCCESSUPDATEMESSAGE, responseEntity.getBody());
+    }
+
+    @Test
+    void testUpdateShipmentStatusByOrderId() {
+        String orderId = "123";
+        String status = ShippingStatus.DIKIRIM.toString();
+        String jwtToken = "validJwtToken";
+        Shipment shipment = new Shipment();
+        shipment.setStatus(status);
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
+
+        when(authHelper.getUserRole(jwtToken)).thenReturn(ADMINROLE);
+        when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
+
+        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(orderId, status, jwtToken);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(SUCCESSUPDATEMESSAGE, responseEntity.getBody());
+    }
+
+    @Test
     void testUpdateShipmentStatusInvalidStatus() throws ExecutionException, InterruptedException {
         String id = "1";
         String invalidStatus = "InvalidStatus";
+        String jwtToken = "validJwtToken";
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(new Shipment());
+
+        when(authHelper.getUserRole(jwtToken)).thenReturn(ADMINROLE);
         when(shipmentService.findById(id)).thenReturn(futureShipment);
 
-        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatus(id, invalidStatus);
+        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatus(id, invalidStatus, jwtToken);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals("Invalid status", responseEntity.getBody());
+        assertEquals(INVALIDSTATUSMESSAGE, responseEntity.getBody());
     }
 
     @Test
     void testUpdateShipmentStatusNotFound() throws ExecutionException, InterruptedException {
         String id = "999";
         String status = ShippingStatus.DIKIRIM.toString();
+        String jwtToken = "validJwtToken";
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(null);
+
+        when(authHelper.getUserRole(jwtToken)).thenReturn(ADMINROLE);
         when(shipmentService.findById(id)).thenReturn(futureShipment);
 
-        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatus(id, status);
+        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatus(id, status, jwtToken);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-        assertEquals("Shipment not found", responseEntity.getBody());
+        assertEquals(NOTFOUNDMESSAGE, responseEntity.getBody());
     }
 
     @Test
     void testUpdateShipmentStatusByOrderIdNotFound() {
         String orderId = "999";
         String status = ShippingStatus.DIKIRIM.toString();
+        String jwtToken = "validJwtToken";
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(null);
+
+        when(authHelper.getUserRole(jwtToken)).thenReturn(ADMINROLE);
         when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
 
-        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(orderId, status);
+        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(orderId, status, jwtToken);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertEquals("Shipment not found", responseEntity.getBody());
+        assertEquals(NOTFOUNDMESSAGE, responseEntity.getBody());
     }
 
     @Test
     void testUpdateOrderShipmentStatusInvalidStatus() {
-        String id = "1";
+        String orderId = "1";
         String invalidStatus = "InvalidStatus";
+        String jwtToken = "validJwtToken";
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(new Shipment());
-        when(shipmentService.findByOrderId(id)).thenReturn(futureShipment);
 
-        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(id, invalidStatus);
+        when(authHelper.getUserRole(jwtToken)).thenReturn(ADMINROLE);
+        when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
+
+        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(orderId, invalidStatus, jwtToken);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals("Invalid status", responseEntity.getBody());
+        assertEquals(INVALIDSTATUSMESSAGE, responseEntity.getBody());
     }
 
     @Test
     void testSetTransportationType() throws ExecutionException, InterruptedException {
         String id = "1";
         String transportationType = TransportationType.TRUK.getValue();
+        String jwtToken = "validJwtToken";
         Shipment shipment = new Shipment();
         shipment.setTransportationType(transportationType);
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
+
+        when(authHelper.getUserRole(jwtToken)).thenReturn(ADMINROLE);
         when(shipmentService.findById(id)).thenReturn(futureShipment);
 
-        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationType(id, transportationType);
+        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationType(id, transportationType, jwtToken);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals("Shipment updated successfully", responseEntity.getBody());
+        assertEquals(SUCCESSUPDATEMESSAGE, responseEntity.getBody());
     }
 
     @Test
     void testSetTransportationTypeByOrderId() {
         String orderId = "123";
         String transportationType = TransportationType.TRUK.getValue();
+        String jwtToken = "validJwtToken";
         Shipment shipment = new Shipment();
         shipment.setTransportationType(transportationType);
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(shipment);
+
+        when(authHelper.getUserRole(jwtToken)).thenReturn(ADMINROLE);
         when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
 
-        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationTypeByOrderId(orderId, transportationType);
+        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationTypeByOrderId(orderId, transportationType, jwtToken);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals("Shipment updated successfully", responseEntity.getBody());
+        assertEquals(SUCCESSUPDATEMESSAGE, responseEntity.getBody());
     }
 
     @Test
     void testSetTransportationTypeByOrderIdNotFound() {
         String orderId = "999";
         String transportationType = TransportationType.TRUK.getValue();
+        String jwtToken = "validJwtToken";
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(null);
+
+        when(authHelper.getUserRole(jwtToken)).thenReturn(ADMINROLE);
         when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
 
-        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationTypeByOrderId(orderId, transportationType);
+        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationTypeByOrderId(orderId, transportationType, jwtToken);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-        assertEquals("Shipment not found", responseEntity.getBody());
+        assertEquals(NOTFOUNDMESSAGE, responseEntity.getBody());
     }
 
     @Test
     void testSetTransportationTypeInvalidTransportationType() {
         String id = "1";
         String invalidTransportationType = "InvalidTransportationType";
+        String jwtToken = "validJwtToken";
         CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(new Shipment());
+
+        when(authHelper.getUserRole(jwtToken)).thenReturn(ADMINROLE);
         when(shipmentService.findById(id)).thenReturn(futureShipment);
 
-        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationType(id, invalidTransportationType);
+        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationType(id, invalidTransportationType, jwtToken);
 
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals("Invalid transportation type", responseEntity.getBody());
+        assertEquals(INVALIDTRANSPORTATIONTYPEMESSAGE, responseEntity.getBody());
+    }
+
+    @Test
+    void testSetTransportationTypeByOrderIdInvalidTransportationType() {
+        String orderId = "1";
+        String invalidTransportationType = "InvalidTransportationType";
+        String jwtToken = "validJwtToken";
+        CompletableFuture<Shipment> futureShipment = CompletableFuture.completedFuture(new Shipment());
+
+        when(authHelper.getUserRole(jwtToken)).thenReturn(ADMINROLE);
+        when(shipmentService.findByOrderId(orderId)).thenReturn(futureShipment);
+
+        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationTypeByOrderId(orderId, invalidTransportationType, jwtToken);
+
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals(INVALIDTRANSPORTATIONTYPEMESSAGE, responseEntity.getBody());
+    }
+
+    @Test
+    void testUpdateShipmentStatusUnauthorized() throws ExecutionException, InterruptedException {
+        String id = "1";
+        String status = ShippingStatus.DIKIRIM.toString();
+
+        when(authHelper.getUserRole("invalidJwtToken")).thenReturn(null);
+
+        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatus(id, status, "invalidJwtToken");
+
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+        assertEquals(UNAUTHORIZEDMESSAGE, responseEntity.getBody());
+    }
+
+    @Test
+    void testUpdateShipmentStatusByOrderIdUnauthorized() {
+        String orderId = "123";
+        String status = ShippingStatus.DIKIRIM.toString();
+
+        when(authHelper.getUserRole("invalidJwtToken")).thenReturn(null);
+
+        ResponseEntity<Object> responseEntity = shipmentController.updateShipmentStatusByOrderId(orderId, status, "invalidJwtToken");
+
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+        assertEquals(UNAUTHORIZEDMESSAGE, responseEntity.getBody());
+    }
+
+    @Test
+    void testSetTransportationTypeUnauthorized() throws ExecutionException, InterruptedException {
+        String id = "1";
+        String transportationType = TransportationType.TRUK.getValue();
+
+        when(authHelper.getUserRole("invalidJwtToken")).thenReturn(null);
+
+        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationType(id, transportationType, "invalidJwtToken");
+
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+        assertEquals(UNAUTHORIZEDMESSAGE, responseEntity.getBody());
+    }
+
+    @Test
+    void testSetTransportationTypeByOrderIdUnauthorized() {
+        String orderId = "123";
+        String transportationType = TransportationType.TRUK.getValue();
+
+        when(authHelper.getUserRole("invalidJwtToken")).thenReturn(null);
+
+        ResponseEntity<Object> responseEntity = shipmentController.setShipmentTransportationTypeByOrderId(orderId, transportationType, "invalidJwtToken");
+
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+        assertEquals(UNAUTHORIZEDMESSAGE, responseEntity.getBody());
+    }
+
+    @Test
+    void testCreateShipmentCatchBlock() throws ExecutionException, InterruptedException {
+        doThrow(new RuntimeException()).when(shipmentService).saveShipment(any(Shipment.class));
+
+        ResponseEntity<Object> response = shipmentController.createShipment("order1");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Failed to create shipment", response.getBody());
+    }
+
+    @Test
+    void testGetShipmentCatchBlock() throws ExecutionException, InterruptedException {
+        when(shipmentService.findById("id1")).thenThrow(new RuntimeException());
+
+        ResponseEntity<Object> response = shipmentController.getShipment("id1");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Shipment not found", response.getBody());
+    }
+
+    @Test
+    void testGetShipmentByOrderIdCatchBlock() {
+        when(shipmentService.findByOrderId("order1")).thenThrow(new RuntimeException());
+
+        ResponseEntity<Object> response = shipmentController.getShipmentByOrderId("order1");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Shipment not found", response.getBody());
+    }
+
+    @Test
+    void testGetAllShipmentsCatchBlock() {
+        when(shipmentService.getAllShipments()).thenThrow(new RuntimeException());
+
+        ResponseEntity<Object> response = shipmentController.getAllShipments();
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Failed to get shipments", response.getBody());
+    }
+
+    @Test
+    void testUpdateShipmentStatusCatchBlock() throws ExecutionException, InterruptedException {
+        when(authHelper.getUserRole(anyString())).thenReturn("ADMIN");
+        when(shipmentService.findById("1")).thenThrow(new RuntimeException());
+
+        ResponseEntity<Object> response = shipmentController.updateShipmentStatus("1", ShippingStatus.DIKIRIM.getValue(), "jwtToken");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Shipment not found", response.getBody());
+    }
+
+    @Test
+    void testUpdateShipmentStatusByOrderIdCatchBlock() throws ExecutionException, InterruptedException {
+        when(authHelper.getUserRole(anyString())).thenReturn("ADMIN");
+        when(shipmentService.findByOrderId("order1")).thenThrow(new RuntimeException());
+
+        ResponseEntity<Object> response = shipmentController.updateShipmentStatusByOrderId("order1", ShippingStatus.DIKIRIM.getValue(), "jwtToken");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Shipment not found", response.getBody());
+    }
+
+    @Test
+    void testSetShipmentTransportationTypeByOrderIdCatchBlock() throws ExecutionException, InterruptedException {
+        when(authHelper.getUserRole(anyString())).thenReturn("ADMIN");
+        when(shipmentService.findByOrderId("order1")).thenThrow(new RuntimeException());
+
+        ResponseEntity<Object> response = shipmentController.setShipmentTransportationTypeByOrderId("order1", TransportationType.TRUK.getValue(), "jwtToken");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Shipment not found", response.getBody());
+    }
+
+    @Test
+    void testSetShipmentTransportationTypeCatchBlock() throws ExecutionException, InterruptedException {
+        when(authHelper.getUserRole(anyString())).thenReturn("ADMIN");
+        when(shipmentService.findById("1")).thenThrow(new RuntimeException());
+
+        ResponseEntity<Object> response = shipmentController.setShipmentTransportationType("1", TransportationType.TRUK.getValue(), "jwtToken");
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("Shipment not found", response.getBody());
     }
 }
