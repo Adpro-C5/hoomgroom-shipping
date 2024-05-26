@@ -5,7 +5,6 @@ import enums.TransportationType;
 import id.ac.ui.cs.advprog.shipping.helper.AuthHelper;
 import id.ac.ui.cs.advprog.shipping.model.Shipment;
 import id.ac.ui.cs.advprog.shipping.service.ShipmentService;
-import org.checkerframework.checker.units.qual.N;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -133,7 +132,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testGetAllShipmentsNoShipments() throws ExecutionException, InterruptedException {
+    void testGetAllShipmentsNoShipments() {
         List<Shipment> shipments = Collections.emptyList();
         CompletableFuture<List<Shipment>> futureShipments = CompletableFuture.completedFuture(shipments);
         when(shipmentService.getAllShipments()).thenReturn(futureShipments);
@@ -181,7 +180,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatusInvalidStatus() throws ExecutionException, InterruptedException {
+    void testUpdateShipmentStatusInvalidStatus()  {
         String id = "1";
         String invalidStatus = "InvalidStatus";
         String jwtToken = "validJwtToken";
@@ -197,7 +196,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatusNotFound() throws ExecutionException, InterruptedException {
+    void testUpdateShipmentStatusNotFound() {
         String id = "999";
         String status = ShippingStatus.DIKIRIM.toString();
         String jwtToken = "validJwtToken";
@@ -245,7 +244,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testSetTransportationType() throws ExecutionException, InterruptedException {
+    void testSetTransportationType() {
         String id = "1";
         String transportationType = TransportationType.TRUK.getValue();
         String jwtToken = "validJwtToken";
@@ -329,7 +328,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatusUnauthorized() throws ExecutionException, InterruptedException {
+    void testUpdateShipmentStatusUnauthorized()  {
         String id = "1";
         String status = ShippingStatus.DIKIRIM.toString();
 
@@ -355,7 +354,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testSetTransportationTypeUnauthorized() throws ExecutionException, InterruptedException {
+    void testSetTransportationTypeUnauthorized() {
         String id = "1";
         String transportationType = TransportationType.TRUK.getValue();
 
@@ -381,7 +380,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testCreateShipmentCatchBlock() throws ExecutionException, InterruptedException {
+    void testCreateShipmentCatchBlock() {
         doThrow(new RuntimeException()).when(shipmentService).saveShipment(any(Shipment.class));
 
         ResponseEntity<Object> response = shipmentController.createShipment("order1");
@@ -421,7 +420,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatusCatchBlock() throws ExecutionException, InterruptedException {
+    void testUpdateShipmentStatusCatchBlock()  {
         when(authHelper.getUserRole(anyString())).thenReturn("ADMIN");
         when(shipmentService.findById("1")).thenThrow(new RuntimeException());
 
@@ -432,7 +431,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testUpdateShipmentStatusByOrderIdCatchBlock() throws ExecutionException, InterruptedException {
+    void testUpdateShipmentStatusByOrderIdCatchBlock() {
         when(authHelper.getUserRole(anyString())).thenReturn("ADMIN");
         when(shipmentService.findByOrderId("order1")).thenThrow(new RuntimeException());
 
@@ -443,7 +442,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testSetShipmentTransportationTypeByOrderIdCatchBlock() throws ExecutionException, InterruptedException {
+    void testSetShipmentTransportationTypeByOrderIdCatchBlock() {
         when(authHelper.getUserRole(anyString())).thenReturn("ADMIN");
         when(shipmentService.findByOrderId("order1")).thenThrow(new RuntimeException());
 
@@ -454,7 +453,7 @@ class ShipmentControllerTest {
     }
 
     @Test
-    void testSetShipmentTransportationTypeCatchBlock() throws ExecutionException, InterruptedException {
+    void testSetShipmentTransportationTypeCatchBlock()  {
         when(authHelper.getUserRole(anyString())).thenReturn("ADMIN");
         when(shipmentService.findById("1")).thenThrow(new RuntimeException());
 
