@@ -44,12 +44,33 @@ class ShipmentRepositoryTest {
     }
 
     @Test
+    void testSaveShipmentNotFound() {
+        Shipment shipment = shipments.getFirst();
+        when(shipmentRepository.findById(shipment.getId())).thenReturn(shipment);
+
+        Shipment compare = shipmentRepository.saveShipment(shipment);
+        assertEquals(shipment, compare);
+        verify(entityManager, never()).persist(shipment);
+        verify(entityManager, times(1)).merge(shipment);
+    }
+
+    @Test
     void testDeleteShipment() {
         Shipment shipment = shipments.getFirst();
         when(entityManager.find(Shipment.class, shipment.getId())).thenReturn(shipment);
         Shipment compare = shipmentRepository.deleteShipment(shipment.getId());
         assertEquals(shipment, compare);
         verify(entityManager, times(1)).remove(shipment);
+    }
+
+    @Test
+    void testDeleteShipmentNotFound() {
+        String shipmentId = "non-existent-id";
+        when(entityManager.find(Shipment.class, shipmentId)).thenReturn(null);
+
+        Shipment compare = shipmentRepository.deleteShipment(shipmentId);
+        assertNull(compare);
+        verify(entityManager, never()).remove(any(Shipment.class));
     }
 
 
