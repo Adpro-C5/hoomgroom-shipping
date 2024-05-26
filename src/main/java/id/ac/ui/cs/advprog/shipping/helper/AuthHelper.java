@@ -16,7 +16,7 @@ public class AuthHelper {
             HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(
-                    "http://localhost:8090/profile/role",
+                    "http://34.143.253.15/profile/role",
                     HttpMethod.GET,
                     entity,
                     String.class
